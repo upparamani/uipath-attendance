@@ -1,0 +1,19 @@
+body{
+font-family:Arial;
+background:#0a0a0f;
+color:#e8e8f0;
+text-align:center;
+}
+
+.card{
+background:#1a1a26;
+padding:20px;
+margin:20px;
+border-radius:10px;
+}
+
+button{
+padding:10px 15px;
+margin:5px;
+cursor:pointer;
+}
