@@ -235,6 +235,17 @@ sess.present.forEach(u=>{
 let li=document.createElement("li");
 li.innerText=u;
 presentList.appendChild(li);
+  //
+absentList.innerHTML="";
+
+STUDENTS[sess.division].forEach(s=>{
+if(!sess.present.includes(s.id)){
+let li=document.createElement("li");
+li.innerText=s.id+" - "+s.name;
+absentList.appendChild(li);
+}
+});
+  //
 });
 
 count.innerText=sess.present.length;
