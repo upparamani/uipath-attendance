@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attendance System V6</title>
+
+<link rel="stylesheet" href="style.css">
+<script src="students.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+</head>
+
+<body>
+
+<header>
+<h2>ISE Dept · UI Path Lab Attendance</h2>
+</header>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="login">
+
+<div class="card hidden" id="profcard">
+<h2>Professor</h2>
+<button class="green" onclick="showProfessor()">Open Dashboard</button>
+</div>
+
+<div class="card">
+<h3>Student</h3>
+<button class="blue" onclick="showStudent()">Mark Attendance</button>
+</div>
+
+</div>
+
+<!-- STUDENT -->
+<div id="student" class="hidden">
+<div class="card">
+
+<h3>Student Attendance</h3>
+
+<select id="division">
+<option value="A">Division A</option>
+<option value="B">Division B</option>
+</select>
+
+<input id="usn" placeholder="Enter USN" oninput="previewName()">
+<div id="namePreview"></div>
+
+<input id="token" placeholder="Token">
+
+<button id="submitBtn" class="green" onclick="submitAttendance()">Submit</button>
+
+<div id="result"></div>
+
+</div>
+</div>
+
+<!-- PROFESSOR -->
+<div id="prof" class="hidden">
+
+<div class="card">
+
+<select id="divisionProf">
+<option value="A">Division A</option>
+<option value="B">Division B</option>
+</select>
+
+<input type="date" id="datePicker">
+
+<select id="period">
+<option>P1</option>
+<option>P2</option>
+</select>
+
+<button onclick="openSession()">Open</button>
+<button onclick="pauseSession()">Pause</button>
+<button onclick="resumeSession()">Resume</button>
+<button onclick="closeSession()">Close</button>
+
+<h2 id="status">CLOSED</h2>
+<div id="tokenDisplay"></div>
+<div id="timer"></div>
+<div id="count"></div>
+
+</div>
+
+<div class="card">
+<h3>Live</h3>
+<ul id="presentList"></ul>
+</div>
+
+<div class="card">
+<h3>Absent</h3>
+<ul id="absentList"></ul>
+</div>
+
+<button onclick="exportExcel()">Export Excel</button>
+
+</div>
+
+</div>
+
+<script>
+
+// 🔧 CONFIG
+  //BIN URL
+//https://api.jsonbin.io/v3/b/69c2a5a0aa77b81da915600d
+//BIN_ID
+//69c2a5a0aa77b81da915600d
+//API_KEY
+//$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW
+const BIN_ID = "69c2a5a0aa77b81da915600d";
+const API_KEY = "$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
+const BASE = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+  
+let paused=false;
+let timerInterval;
+let pollInterval;
+
+// 🔧 STUDENTS (replace later properly)
+const STUDENTS = {
+A: [],
+B: []
+};
+
+// API
+async function apiGet(){
+let r=await fetch(BASE+"/latest",{headers:{'X-Master-Key':API_KEY}});
+return (await r.json()).record;
+}
+
+async function apiPut(data){
+await fetch(BASE,{
+method:'PUT',
+headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+body:JSON.stringify(data)
+});
+}
+
+// UI
+function hideAll(){
+login.style.display="none";
+student.style.display="none";
+prof.style.display="none";
+}
+
+function showStudent(){ hideAll(); student.style.display="block"; }
+function showProfessor(){ hideAll(); prof.style.display="block"; startPolling(); }
+
+function updateStatus(s){
+status.innerText=s;
+}
+
+// SESSION
+function randomToken(){ return Math.floor(1000+Math.random()*9000); }
+
+async function openSession(){
+
+let data=await apiGet();
+
+if(data.activeSession){ alert("Already Open"); return; }
+
+let session={
+division:divisionProf.value,
+date:datePicker.value,
+period:period.value,
+token:randomToken(),
+present:[],
+times:{},
+paused:false
+};
+
+data.activeSession=session;
+await apiPut(data);
+
+tokenDisplay.innerText=session.token;
+updateStatus("OPEN");
+
+startTimer();
+}
+
+async function pauseSession(){
+paused=true;
+let data=await apiGet();
+data.activeSession.paused=true;
+await apiPut(data);
+updateStatus("PAUSED");
+}
+
+async function resumeSession(){
+paused=false;
+let data=await apiGet();
+data.activeSession.paused=false;
+await apiPut(data);
+updateStatus("OPEN");
+}
+
+async function closeSession(){
+
+let data=await apiGet();
+
+data.sessions.push(data.activeSession);
+data.activeSession=null;
+
+await apiPut(data);
+
+updateStatus("CLOSED");
+clearInterval(timerInterval);
+}
+
+// TIMER
+function startTimer(){
+let t=300;
+timerInterval=setInterval(()=>{
+if(paused) return;
+t--;
+timer.innerText="Time "+t;
+if(t<=0) closeSession();
+},1000);
+}
+
+// POLLING
+function startPolling(){
+pollInterval=setInterval(loadData,2000);
+}
+
+async function loadData(){
+
+let data=await apiGet();
+if(!data.activeSession) return;
+
+let sess=data.activeSession;
+
+presentList.innerHTML="";
+sess.present.forEach(u=>{
+let li=document.createElement("li");
+li.innerText=u;
+presentList.appendChild(li);
+});
+
+count.innerText=sess.present.length;
+}
+
+// STUDENT
+function previewName(){
+let div=division.value;
+let stu=STUDENTS[div].find(s=>s.id===usn.value);
+namePreview.innerText=stu?stu.name:"";
+}
+
+async function submitAttendance(){
+
+let data=await apiGet();
+
+if(!data.activeSession){ result.innerText="Closed"; return; }
+
+let sess=data.activeSession;
+
+if(sess.token!=token.value){ result.innerText="Wrong Token"; return; }
+
+let div=division.value;
+
+let stu=STUDENTS[div].find(s=>s.id===usn.value);
+
+if(!stu){ result.innerText="Invalid"; return; }
+
+if(sess.present.includes(usn.value)){ result.innerText="Already"; return; }
+
+sess.present.push(usn.value);
+
+await apiPut(data);
+
+result.innerText="Marked";
+
+submitBtn.disabled=true;
+}
+
+// EXCEL (basic)
+function exportExcel(){
+alert("Excel module next step");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+let p=new URLSearchParams(location.search);
+if(p.get("prof")=="1")profcard.style.display="block";
+});
+
+</script>
+
+</body>
+</html>
