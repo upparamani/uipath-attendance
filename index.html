@@ -3,299 +3,903 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Attendance System V6</title>
-
-<link rel="stylesheet" href="style.css">
+<title>Attendance System · UIPath Lab</title>
 <script src="students.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap');
 
+:root {
+  --bg: #060610;
+  --surface: #0e0e1c;
+  --card: #13132a;
+  --border: #2a2a4a;
+  --accent: #5b6ef5;
+  --accent2: #22d3a5;
+  --danger: #f55b5b;
+  --warn: #f5c95b;
+  --text: #e8e8f4;
+  --muted: #6868a0;
+  --green: #22d3a5;
+  --blue: #5b6ef5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+header .logo {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+header h2 {
+  font-size: 15px; font-weight: 600;
+  letter-spacing: 0.02em;
+}
+header span {
+  font-size: 12px; color: var(--muted);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ─── LAYOUT ─── */
+.page { display: none; }
+.page.active { display: block; }
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* ─── FORM ELEMENTS ─── */
+select, input[type="text"], input[type="date"], input[type="password"] {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  width: 100%;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+select:focus, input:focus {
+  border-color: var(--accent);
+}
+
+/* ─── BUTTONS ─── */
+button {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+button:hover { opacity: 0.88; }
+button:active { transform: scale(0.97); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-accent  { background: var(--accent);  color: #fff; }
+.btn-green   { background: var(--green);   color: #060610; }
+.btn-warn    { background: var(--warn);    color: #060610; }
+.btn-danger  { background: var(--danger);  color: #fff; }
+.btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-blue    { background: var(--blue);    color: #fff; }
+
+/* ─── HOME PAGE ─── */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 600px;
+  margin: 60px auto 0;
+}
+@media(max-width:540px){ .home-grid { grid-template-columns: 1fr; } }
+
+.home-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.home-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+.home-card .icon {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+.home-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.home-card p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* ─── STATUS BADGE ─── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.status-badge .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-open   { background: rgba(34,211,165,0.12); color: var(--green); }
+.status-closed { background: rgba(104,104,160,0.15); color: var(--muted); }
+.status-paused { background: rgba(245,201,91,0.12); color: var(--warn); }
+
+/* ─── PROF CONTROLS ROW ─── */
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+.controls-row .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 120px;
+}
+.controls-row .field label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.controls-row select,
+.controls-row input[type="date"] {
+  margin-bottom: 0;
+}
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ─── TOKEN DISPLAY ─── */
+.token-display {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin: 16px 0;
+}
+.token-display .token-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.token-display .token-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: 0.1em;
+}
+.token-display .timer-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* ─── STATS ROW ─── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-box .stat-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent2);
+}
+.stat-box .stat-lbl {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+/* ─── LISTS ─── */
+.student-list {
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.student-list li {
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.student-list li:nth-child(odd) { background: rgba(255,255,255,0.03); }
+.student-list li .usn {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.list-present li { border-left: 3px solid var(--green); }
+.list-absent  li { border-left: 3px solid var(--danger); }
+
+/* ─── TWO COLUMN LIST GRID ─── */
+.list-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media(max-width:640px){ .list-grid { grid-template-columns: 1fr; } }
+
+/* ─── NAME PREVIEW ─── */
+.name-preview {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent2);
+  min-height: 22px;
+  margin-bottom: 8px;
+}
+
+/* ─── RESULT MSG ─── */
+.result-msg {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 12px;
+  text-align: center;
+  display: none;
+}
+.result-msg.show { display: block; }
+.result-ok     { background: rgba(34,211,165,0.12); color: var(--green); border: 1px solid rgba(34,211,165,0.3); }
+.result-err    { background: rgba(245,91,91,0.12);  color: var(--danger); border: 1px solid rgba(245,91,91,0.3); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,6,16,0.85);
+  display: none;
+  place-items: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show { display: grid; }
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px;
+  width: 320px;
+  text-align: center;
+}
+.modal-box h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.modal-box p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.modal-box input {
+  margin-bottom: 16px;
+}
+.modal-err {
+  color: var(--danger);
+  font-size: 12px;
+  margin-top: -8px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+/* ─── BACK BTN ─── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Sora', sans-serif;
+}
+.back-btn:hover { color: var(--text); }
+
+/* ─── SECTION TITLE ─── */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+</style>
 </head>
-
 <body>
 
 <header>
-<h2>ISE Dept · UI Path Lab Attendance</h2>
+  <div class="logo">UI</div>
+  <h2>ISE Dept · UI Path Lab Attendance</h2>
 </header>
 
-<div class="container">
-
-<!-- LOGIN -->
-<div id="login">
-
-<div class="card hidden" id="profcard">
-<h2>Professor</h2>
-<button class="green" onclick="showProfessor()">Open Dashboard</button>
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="page-home" class="page active">
+  <div class="container">
+    <div class="home-grid">
+      <div class="home-card" onclick="goStudent()">
+        <div class="icon">🎓</div>
+        <h3>Student</h3>
+        <p>Mark your attendance using the session token</p>
+        <button class="btn-green" style="width:100%">Mark Attendance</button>
+      </div>
+      <div class="home-card" id="prof-home-card" style="display:none" onclick="showProfModal()">
+        <div class="icon">👩‍💻</div>
+        <h3>Professor</h3>
+        <p>Open, manage & export attendance sessions</p>
+        <button class="btn-accent" style="width:100%">Open Dashboard</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card">
-<h3>Student</h3>
-<button class="blue" onclick="showStudent()">Mark Attendance</button>
+<!-- ═══════════════ STUDENT ═══════════════ -->
+<div id="page-student" class="page">
+  <div class="container">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="section-title">Mark Attendance</div>
+
+    <div class="card" style="max-width:440px;margin:0 auto">
+      <h3>Your Details</h3>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Division</label>
+          <select id="stu-division" onchange="previewName()">
+            <option value="A">Division A</option>
+            <option value="B">Division B</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">USN</label>
+          <input type="text" id="stu-usn" placeholder="2GI23IS001" oninput="previewName()" style="text-transform:uppercase">
+        </div>
+      </div>
+
+      <div class="name-preview" id="name-preview">—</div>
+
+      <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Session Token</label>
+      <input type="text" id="stu-token" placeholder="4-digit token from board" maxlength="4">
+
+      <button id="stu-submit-btn" class="btn-green" style="width:100%;margin-top:4px" onclick="submitAttendance()">Submit Attendance</button>
+
+      <div id="stu-result" class="result-msg"></div>
+    </div>
+  </div>
 </div>
 
+<!-- ═══════════════ PROFESSOR ═══════════════ -->
+<div id="page-prof" class="page">
+  <div class="container">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="section-title">Professor Dashboard</div>
+
+    <!-- Controls -->
+    <div class="card">
+      <h3>Session Controls</h3>
+      <div class="controls-row">
+        <div class="field">
+          <label>Division</label>
+          <select id="prof-division">
+            <option value="A">Division A</option>
+            <option value="B">Division B</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="prof-date">
+        </div>
+        <div class="field">
+          <label>Period</label>
+          <select id="prof-period">
+            <option>P1</option><option>P2</option><option>P3</option>
+            <option>P4</option><option>P5</option><option>P6</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-green"  onclick="openSession()">▶ Open</button>
+        <button class="btn-warn"   onclick="pauseSession()">⏸ Pause</button>
+        <button class="btn-accent" onclick="resumeSession()">▶ Resume</button>
+        <button class="btn-danger" onclick="closeSession()">■ Close</button>
+      </div>
+    </div>
+
+    <!-- Token + Status -->
+    <div class="token-display" id="token-display" style="display:none">
+      <div class="token-label">Session Token</div>
+      <div class="token-value" id="token-value">—</div>
+      <div class="timer-text" id="timer-text">—</div>
+      <div style="margin-top:12px" id="status-badge-wrap">
+        <span class="status-badge status-closed" id="status-badge">
+          <span class="dot"></span>CLOSED
+        </span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="stat-present">0</div>
+        <div class="stat-lbl">Present</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-absent">0</div>
+        <div class="stat-lbl">Absent</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-lbl">Total</div>
+      </div>
+    </div>
+
+    <!-- Lists -->
+    <div class="list-grid">
+      <div class="card">
+        <h3>✅ Present</h3>
+        <ul class="student-list list-present" id="present-list"></ul>
+      </div>
+      <div class="card">
+        <h3>❌ Absent</h3>
+        <ul class="student-list list-absent" id="absent-list"></ul>
+      </div>
+    </div>
+
+    <button class="btn-blue" style="width:100%;padding:14px;font-size:14px" onclick="exportExcel()">
+      📥 Export Excel
+    </button>
+  </div>
 </div>
 
-<!-- STUDENT -->
-<div id="student" class="hidden">
-<div class="card">
-
-<h3>Student Attendance</h3>
-
-<select id="division">
-<option value="A">Division A</option>
-<option value="B">Division B</option>
-</select>
-
-<input id="usn" placeholder="Enter USN" oninput="previewName()">
-<div id="namePreview"></div>
-
-<input id="token" placeholder="Token">
-
-<button id="submitBtn" class="green" onclick="submitAttendance()">Submit</button>
-
-<div id="result"></div>
-
-</div>
-</div>
-
-<!-- PROFESSOR -->
-<div id="prof" class="hidden">
-
-<div class="card">
-
-<select id="divisionProf">
-<option value="A">Division A</option>
-<option value="B">Division B</option>
-</select>
-
-<input type="date" id="datePicker">
-
-<select id="period">
-<option>P1</option>
-<option>P2</option>
-</select>
-
-<button onclick="openSession()">Open</button>
-<button onclick="pauseSession()">Pause</button>
-<button onclick="resumeSession()">Resume</button>
-<button onclick="closeSession()">Close</button>
-
-<h2 id="status">CLOSED</h2>
-<div id="tokenDisplay"></div>
-<div id="timer"></div>
-<div id="count"></div>
-
-</div>
-
-<div class="card">
-<h3>Live</h3>
-<ul id="presentList"></ul>
-</div>
-
-<div class="card">
-<h3>Absent</h3>
-<ul id="absentList"></ul>
-</div>
-
-<button onclick="exportExcel()">Export Excel</button>
-
-</div>
-
+<!-- ═══════════════ PROF PASSWORD MODAL ═══════════════ -->
+<div class="modal-overlay" id="prof-modal">
+  <div class="modal-box">
+    <h3>🔐 Professor Access</h3>
+    <p>Enter the dashboard password to continue</p>
+    <input type="password" id="prof-password" placeholder="Password" onkeydown="if(event.key==='Enter')checkProfPass()">
+    <div class="modal-err" id="prof-pass-err">Incorrect password</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-ghost" style="flex:1" onclick="closeProfModal()">Cancel</button>
+      <button class="btn-accent" style="flex:1" onclick="checkProfPass()">Enter</button>
+    </div>
+  </div>
 </div>
 
 <script>
-
-// 🔧 CONFIG
-  //BIN URL
-//https://api.jsonbin.io/v3/b/69c2a5a0aa77b81da915600d
-//BIN_ID
-//69c2a5a0aa77b81da915600d
-//API_KEY
-//$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW
-const BIN_ID = "69c2a5a0aa77b81da915600d";
+// ─── CONFIG ───
+const BIN_ID  = "69c2a5a0aa77b81da915600d";
 const API_KEY = "$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
-const BASE = "https://api.jsonbin.io/v3/b/" + BIN_ID;
-  
-let paused=false;
-let timerInterval;
-let pollInterval;
+const BASE    = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+const PROF_PASS = "uipath123"; // ← change as needed
 
-// 🔧 STUDENTS (replace later properly)
+let timerInterval = null;
+let pollInterval  = null;
+let timerSeconds  = 0;
 
-
-// API
-async function apiGet(){
-let r=await fetch(BASE+"/latest",{headers:{'X-Master-Key':API_KEY}});
-return (await r.json()).record;
+// ─── ROUTING ───
+function goHome() {
+  clearInterval(pollInterval);
+  showPage("page-home");
+}
+function goStudent() { showPage("page-student"); }
+function goProf() {
+  showPage("page-prof");
+  setTodayDate();
+  startPolling();
 }
 
-async function apiPut(data){
-await fetch(BASE,{
-method:'PUT',
-headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-body:JSON.stringify(data)
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── PROF MODAL ───
+function showProfModal() {
+  document.getElementById('prof-password').value = "";
+  document.getElementById('prof-pass-err').style.display = "none";
+  document.getElementById('prof-modal').classList.add('show');
+  setTimeout(() => document.getElementById('prof-password').focus(), 100);
+}
+function closeProfModal() {
+  document.getElementById('prof-modal').classList.remove('show');
+}
+function checkProfPass() {
+  const v = document.getElementById('prof-password').value;
+  if (v === PROF_PASS) {
+    closeProfModal();
+    goProf();
+  } else {
+    document.getElementById('prof-pass-err').style.display = "block";
+    document.getElementById('prof-password').value = "";
+  }
+}
+
+// ─── API ───
+async function apiGet() {
+  const r = await fetch(BASE + "/latest", {
+    headers: { 'X-Master-Key': API_KEY }
+  });
+  return (await r.json()).record;
+}
+async function apiPut(data) {
+  await fetch(BASE, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+    body: JSON.stringify(data)
+  });
+}
+
+// ─── SESSION ───
+function randomToken() { return Math.floor(1000 + Math.random() * 9000); }
+
+async function openSession() {
+  const data = await apiGet();
+  if (data.activeSession) { alert("A session is already open. Close it first."); return; }
+
+  const session = {
+    division : document.getElementById('prof-division').value,
+    date     : document.getElementById('prof-date').value,
+    period   : document.getElementById('prof-period').value,
+    token    : randomToken(),
+    present  : [],
+    times    : {},
+    paused   : false
+  };
+
+  data.activeSession = session;
+  await apiPut(data);
+  renderSession(session);
+  startTimer(300);
+}
+
+async function pauseSession() {
+  const data = await apiGet();
+  if (!data.activeSession) return;
+  data.activeSession.paused = true;
+  await apiPut(data);
+  setStatusBadge("paused");
+  clearInterval(timerInterval);
+}
+
+async function resumeSession() {
+  const data = await apiGet();
+  if (!data.activeSession) return;
+  data.activeSession.paused = false;
+  await apiPut(data);
+  setStatusBadge("open");
+  startTimer(timerSeconds);
+}
+
+async function closeSession() {
+  if (!confirm("Close this session?")) return;
+  const data = await apiGet();
+  if (!data.activeSession) return;
+  if (!data.sessions) data.sessions = [];
+  data.sessions.push(data.activeSession);
+  data.activeSession = null;
+  await apiPut(data);
+  clearInterval(timerInterval);
+  document.getElementById('token-display').style.display = "none";
+  setStatusBadge("closed");
+  document.getElementById('present-list').innerHTML = "";
+  document.getElementById('absent-list').innerHTML  = "";
+  updateStats(0, 0, 0);
+}
+
+// ─── TIMER ───
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  timerSeconds = seconds;
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    const m = Math.floor(timerSeconds / 60);
+    const s = String(timerSeconds % 60).padStart(2, '0');
+    document.getElementById('timer-text').textContent = `⏱ ${m}:${s} remaining`;
+    if (timerSeconds <= 0) { clearInterval(timerInterval); closeSession(); }
+  }, 1000);
+}
+
+// ─── RENDER ───
+function renderSession(sess) {
+  document.getElementById('token-display').style.display = "block";
+  document.getElementById('token-value').textContent = sess.token;
+  if (sess.paused) setStatusBadge("paused");
+  else setStatusBadge("open");
+}
+
+function setStatusBadge(state) {
+  const el = document.getElementById('status-badge');
+  el.className = "status-badge";
+  if (state === "open")   { el.classList.add('status-open');   el.innerHTML = '<span class="dot"></span>OPEN'; }
+  if (state === "paused") { el.classList.add('status-paused'); el.innerHTML = '<span class="dot"></span>PAUSED'; }
+  if (state === "closed") { el.classList.add('status-closed'); el.innerHTML = '<span class="dot"></span>CLOSED'; }
+}
+
+function updateStats(present, absent, total) {
+  document.getElementById('stat-present').textContent = present;
+  document.getElementById('stat-absent').textContent  = absent;
+  document.getElementById('stat-total').textContent   = total;
+}
+
+// ─── POLLING ───
+function startPolling() {
+  clearInterval(pollInterval);
+  loadData();
+  pollInterval = setInterval(loadData, 3000);
+}
+
+async function loadData() {
+  try {
+    const data = await apiGet();
+    if (!data.activeSession) return;
+
+    const sess = data.activeSession;
+    renderSession(sess);
+
+    const students  = STUDENTS[sess.division] || [];
+    const presentIds = sess.present || [];
+
+    // Present list
+    const pList = document.getElementById('present-list');
+    pList.innerHTML = "";
+    presentIds.forEach(uid => {
+      const stu = students.find(s => s.id === uid);
+      const li  = document.createElement('li');
+      li.innerHTML = `<span class="usn">${uid}</span> ${stu ? stu.name : uid}`;
+      pList.appendChild(li);
+    });
+
+    // Absent list  ← BUG FIX: was inside present forEach before
+    const aList = document.getElementById('absent-list');
+    aList.innerHTML = "";
+    students.forEach(s => {
+      if (!presentIds.includes(s.id)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="usn">${s.id}</span> ${s.name}`;
+        aList.appendChild(li);
+      }
+    });
+
+    updateStats(presentIds.length, students.length - presentIds.length, students.length);
+  } catch(e) { /* network hiccup, retry next poll */ }
+}
+
+// ─── STUDENT ───
+function previewName() {
+  const div = document.getElementById('stu-division').value;
+  const usn = document.getElementById('stu-usn').value.trim().toUpperCase();
+  const stu = STUDENTS[div] && STUDENTS[div].find(s => s.id === usn);
+  document.getElementById('name-preview').textContent = stu ? stu.name : (usn ? "USN not found" : "—");
+  document.getElementById('name-preview').style.color = stu ? 'var(--accent2)' : 'var(--muted)';
+}
+
+function showResult(msg, ok) {
+  const el = document.getElementById('stu-result');
+  el.textContent  = msg;
+  el.className    = "result-msg show " + (ok ? "result-ok" : "result-err");
+}
+
+async function submitAttendance() {
+  const div   = document.getElementById('stu-division').value;
+  const usn   = document.getElementById('stu-usn').value.trim().toUpperCase();
+  const token = document.getElementById('stu-token').value.trim();
+
+  if (!usn || !token) { showResult("Please fill in USN and token.", false); return; }
+
+  const stu = STUDENTS[div] && STUDENTS[div].find(s => s.id === usn);
+  if (!stu) { showResult("USN not found in " + div + " division.", false); return; }
+
+  document.getElementById('stu-submit-btn').disabled = true;
+
+  try {
+    const data = await apiGet();
+    if (!data.activeSession)              { showResult("No active session.", false); }
+    else if (data.activeSession.paused)   { showResult("Session is paused. Wait for professor.", false); }
+    else if (String(data.activeSession.token) !== String(token)) { showResult("Wrong token. Check the board.", false); }
+    else if (data.activeSession.division !== div)  { showResult("Wrong division selected.", false); }
+    else if (data.activeSession.present.includes(usn)) { showResult("Already marked present! ✓", true); }
+    else {
+      data.activeSession.present.push(usn);
+      data.activeSession.times[usn] = new Date().toLocaleTimeString('en-IN');
+      await apiPut(data);
+      showResult("✓ Attendance marked for " + stu.name, true);
+    }
+  } catch(e) {
+    showResult("Network error. Try again.", false);
+  }
+
+  document.getElementById('stu-submit-btn').disabled = false;
+}
+
+// ─── EXPORT EXCEL ───
+function exportExcel() {
+  // Collect last closed session or prompt for a saved session
+  const pick = prompt("Export which?\n1 = Active session\n2 = Cancel");
+  if (pick !== "1") return;
+
+  apiGet().then(data => {
+    const sess = data.activeSession;
+    if (!sess) { alert("No active session to export."); return; }
+
+    const students  = STUDENTS[sess.division] || [];
+    const wb = XLSX.utils.book_new();
+
+    // Sheet: Attendance
+    const rows = [["USN", "Name", "Status", "Time"]];
+    students.forEach(s => {
+      const present = sess.present.includes(s.id);
+      rows.push([
+        s.id,
+        s.name,
+        present ? "Present" : "Absent",
+        present ? (sess.times[s.id] || "—") : ""
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    // Style header
+    ["A1","B1","C1","D1"].forEach(cell => {
+      if (ws[cell]) ws[cell].s = {
+        fill: { fgColor: { rgb: "1a1a50" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } }
+      };
+    });
+
+    // Color rows
+    for (let r = 2; r <= students.length + 1; r++) {
+      const cellC = "C" + r;
+      if (ws[cellC]) {
+        const isP = ws[cellC].v === "Present";
+        ["A","B","C","D"].forEach(col => {
+          const c = col + r;
+          if (ws[c]) ws[c].s = {
+            fill: { fgColor: { rgb: isP ? "e6fff8" : "fff0f0" } }
+          };
+        });
+      }
+    }
+
+    ws['!cols'] = [{wch:16},{wch:30},{wch:10},{wch:12}];
+
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+
+    // Summary sheet
+    const present = sess.present.length;
+    const total   = students.length;
+    const sumRows = [
+      ["Summary",""],
+      ["Division", sess.division],
+      ["Date",     sess.date],
+      ["Period",   sess.period],
+      ["Present",  present],
+      ["Absent",   total - present],
+      ["Total",    total],
+      ["% Attendance", ((present/total)*100).toFixed(1)+"%"]
+    ];
+    const ws2 = XLSX.utils.aoa_to_sheet(sumRows);
+    ws2['!cols'] = [{wch:20},{wch:20}];
+    XLSX.utils.book_append_sheet(wb, ws2, "Summary");
+
+    const fname = `Attendance_UIPath_Div${sess.division}_${sess.date}_${sess.period}.xlsx`;
+    XLSX.writeFile(wb, fname);
+  });
+}
+
+// ─── INIT ───
+function setTodayDate() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  document.getElementById('prof-date').value = `${y}-${m}-${day}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Show prof card if ?prof=1
+  const p = new URLSearchParams(location.search);
+  if (p.get("prof") === "1") {
+    document.getElementById('prof-home-card').style.display = "block";
+  }
+  setTodayDate();
 });
-}
-
-// UI
-function hideAll(){
-login.style.display="none";
-student.style.display="none";
-prof.style.display="none";
-}
-
-function showStudent(){ hideAll(); student.style.display="block"; }
-function showProfessor(){ hideAll(); prof.style.display="block"; startPolling(); }
-
-function updateStatus(s){
-status.innerText=s;
-}
-
-// SESSION
-function randomToken(){ return Math.floor(1000+Math.random()*9000); }
-
-async function openSession(){
-
-let data=await apiGet();
-
-if(data.activeSession){ alert("Already Open"); return; }
-
-let session={
-division:divisionProf.value,
-date:datePicker.value,
-period:period.value,
-token:randomToken(),
-present:[],
-times:{},
-paused:false
-};
-
-data.activeSession=session;
-await apiPut(data);
-
-tokenDisplay.innerText=session.token;
-updateStatus("OPEN");
-
-startTimer();
-}
-
-async function pauseSession(){
-paused=true;
-let data=await apiGet();
-data.activeSession.paused=true;
-await apiPut(data);
-updateStatus("PAUSED");
-}
-
-async function resumeSession(){
-paused=false;
-let data=await apiGet();
-data.activeSession.paused=false;
-await apiPut(data);
-updateStatus("OPEN");
-}
-
-async function closeSession(){
-
-let data=await apiGet();
-
-data.sessions.push(data.activeSession);
-data.activeSession=null;
-
-await apiPut(data);
-
-updateStatus("CLOSED");
-clearInterval(timerInterval);
-}
-
-// TIMER
-function startTimer(){
-let t=300;
-timerInterval=setInterval(()=>{
-if(paused) return;
-t--;
-timer.innerText="Time "+t;
-if(t<=0) closeSession();
-},1000);
-}
-
-// POLLING
-function startPolling(){
-pollInterval=setInterval(loadData,2000);
-}
-
-async function loadData(){
-
-let data=await apiGet();
-if(!data.activeSession) return;
-
-let sess=data.activeSession;
-
-presentList.innerHTML="";
-sess.present.forEach(u=>{
-let li=document.createElement("li");
-li.innerText=u;
-presentList.appendChild(li);
-  //
-absentList.innerHTML="";
-
-STUDENTS[sess.division].forEach(s=>{
-if(!sess.present.includes(s.id)){
-let li=document.createElement("li");
-li.innerText=s.id+" - "+s.name;
-absentList.appendChild(li);
-}
-});
-  //
-});
-
-count.innerText=sess.present.length;
-}
-
-// STUDENT
-function previewName(){
-let div=division.value;
-let stu=STUDENTS[div].find(s=>s.id===usn.value);
-namePreview.innerText=stu?stu.name:"";
-}
-
-async function submitAttendance(){
-
-let data=await apiGet();
-
-if(!data.activeSession){ result.innerText="Closed"; return; }
-
-let sess=data.activeSession;
-
-if(sess.token!=token.value){ result.innerText="Wrong Token"; return; }
-
-let div=division.value;
-
-let stu=STUDENTS[div].find(s=>s.id===usn.value);
-
-if(!stu){ result.innerText="Invalid"; return; }
-
-if(sess.present.includes(usn.value)){ result.innerText="Already"; return; }
-
-sess.present.push(usn.value);
-
-await apiPut(data);
-
-result.innerText="Marked";
-
-submitBtn.disabled=true;
-}
-
-// EXCEL (basic)
-function exportExcel(){
-alert("Excel module next step");
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-let p=new URLSearchParams(location.search);
-if(p.get("prof")=="1")profcard.style.display="block";
-});
-
 </script>
-
 </body>
 </html>
