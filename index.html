@@ -3,226 +3,889 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UI Path Lab Attendance</title>
-
+<title>Attendance System · UIPath Lab</title>
 <script src="students.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <style>
-body{margin:0;font-family:sans-serif;background:#0b0b1a;color:#fff}
-header{background:#000;padding:15px;text-align:center;font-size:22px}
-.container{padding:20px}
-.card{background:#151530;margin:15px 0;padding:20px;border-radius:10px;text-align:center}
-button{padding:10px 20px;margin:5px;border:none;border-radius:5px;cursor:pointer}
-.green{background:#28a745;color:#fff}
-.blue{background:#007bff;color:#fff}
-.red{background:#dc3545;color:#fff}
-input,select{padding:8px;margin:5px}
-.hidden{display:none}
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg: #060610;
+  --surface: #0e0e1c;
+  --card: #13132a;
+  --border: #2a2a4a;
+  --accent: #5b6ef5;
+  --accent2: #22d3a5;
+  --danger: #f55b5b;
+  --warn: #f5c95b;
+  --text: #e8e8f4;
+  --muted: #6868a0;
+  --green: #22d3a5;
+  --blue: #5b6ef5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+header .logo {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  color: #fff; flex-shrink: 0;
+}
+header h2 { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.container { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.card h3 {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin-bottom: 20px;
+}
+
+select, input[type="text"], input[type="date"], input[type="password"] {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  padding: 10px 14px;
+  width: 100%;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+select:focus, input:focus { border-color: var(--accent); }
+
+button {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px; font-weight: 600;
+  border: none; border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+button:hover { opacity: 0.88; }
+button:active { transform: scale(0.97); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-accent  { background: var(--accent);  color: #fff; }
+.btn-green   { background: var(--green);   color: #060610; }
+.btn-warn    { background: var(--warn);    color: #060610; }
+.btn-danger  { background: var(--danger);  color: #fff; }
+.btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-blue    { background: var(--blue);    color: #fff; }
+
+/* HOME */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 600px;
+  margin: 60px auto 0;
+}
+@media(max-width:540px){ .home-grid { grid-template-columns: 1fr; } }
+
+.home-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.home-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.home-card .icon { font-size: 36px; margin-bottom: 16px; }
+.home-card h3 {
+  font-size: 16px; font-weight: 700;
+  margin-bottom: 8px; color: var(--text);
+  text-transform: none; letter-spacing: 0;
+}
+.home-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
+}
+.status-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.status-open   { background: rgba(34,211,165,0.12); color: var(--green); }
+.status-closed { background: rgba(104,104,160,0.15); color: var(--muted); }
+.status-paused { background: rgba(245,201,91,0.12);  color: var(--warn); }
+
+/* PROF CONTROLS */
+.controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
+.controls-row .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+.controls-row .field label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.controls-row select, .controls-row input[type="date"] { margin-bottom: 0; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+/* TOKEN */
+.token-display {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0;
+}
+.token-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.token-value { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; color: var(--accent2); letter-spacing: 0.1em; }
+.timer-text  { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-num { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--accent2); }
+.stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+
+/* LISTS */
+.student-list { list-style: none; max-height: 300px; overflow-y: auto; }
+.student-list li { padding: 9px 12px; border-radius: 7px; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+.student-list li:nth-child(odd) { background: rgba(255,255,255,0.03); }
+.student-list li .usn { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.list-present li { border-left: 3px solid var(--green); }
+.list-absent  li { border-left: 3px solid var(--danger); }
+.list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width:640px){ .list-grid { grid-template-columns: 1fr; } }
+
+/* STUDENT SUCCESS STATE */
+.success-card {
+  background: rgba(34,211,165,0.08);
+  border: 1px solid rgba(34,211,165,0.3);
+  border-radius: 14px;
+  padding: 56px 28px;
+  text-align: center;
+  max-width: 440px;
+  margin: 0 auto;
+  animation: fadeUp 0.35s ease;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.success-icon  { font-size: 64px; margin-bottom: 20px; }
+.success-name  { font-size: 22px; font-weight: 700; color: var(--accent2); margin-bottom: 8px; }
+.success-msg   { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+.success-cd    { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); }
+
+/* ERROR MSG */
+.result-msg { padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-top: 12px; text-align: center; display: none; }
+.result-msg.show { display: block; }
+.result-err  { background: rgba(245,91,91,0.12); color: var(--danger); border: 1px solid rgba(245,91,91,0.3); }
+
+/* FLASH CARD — professor new submission alert */
+#flash-card {
+  position: fixed;
+  top: 20px; right: 20px;
+  background: var(--card);
+  border: 1px solid var(--accent2);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 0 24px rgba(34,211,165,0.25);
+  z-index: 200;
+  min-width: 260px;
+  transform: translateX(120%);
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+#flash-card.show { transform: translateX(0); }
+#flash-card .flash-icon { font-size: 24px; flex-shrink: 0; }
+#flash-card .flash-name { font-size: 13px; font-weight: 700; color: var(--accent2); }
+#flash-card .flash-usn  { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(6,6,16,0.85); display: none; place-items: center; z-index: 100; backdrop-filter: blur(4px); }
+.modal-overlay.show { display: grid; }
+.modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 320px; text-align: center; }
+.modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); text-transform: none; letter-spacing: 0; }
+.modal-box p  { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+.modal-box input { margin-bottom: 16px; }
+.modal-err { color: var(--danger); font-size: 12px; margin-top: -8px; margin-bottom: 12px; display: none; }
+
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+.field-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px; font-weight: 600; }
+.name-preview { font-size: 14px; font-weight: 600; min-height: 22px; margin-bottom: 8px; color: var(--muted); }
 </style>
 </head>
-
 <body>
 
-<header>ISE Dept · UI Path Lab Attendance</header>
+<header>
+  <div class="logo">UI</div>
+  <h2>ISE Dept · UI Path Lab Attendance</h2>
+</header>
 
-<div class="container">
-
-<div id="login">
-<div class="card hidden" id="profcard">
-<h2>Professor</h2>
-<button class="green" onclick="showProfessor()">Open Dashboard</button>
+<!-- ══════════ HOME ══════════ -->
+<div id="page-home" class="page active">
+  <div class="container">
+    <div class="home-grid">
+      <div class="home-card" onclick="goStudent()">
+        <div class="icon">🎓</div>
+        <h3>Student</h3>
+        <p>Mark your attendance using the session token</p>
+        <button class="btn-green" style="width:100%">Mark Attendance</button>
+      </div>
+      <div class="home-card" id="prof-home-card" style="display:none" onclick="showProfModal()">
+        <div class="icon">👩‍💻</div>
+        <h3>Professor</h3>
+        <p>Open, manage & export attendance sessions</p>
+        <button class="btn-accent" style="width:100%">Open Dashboard</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="card">
-<h2>Student</h2>
-<button class="blue" onclick="showStudent()">Mark Attendance</button>
-</div>
-</div>
+<!-- ══════════ STUDENT ══════════ -->
+<div id="page-student" class="page">
+  <div class="container">
 
-<div id="student" class="hidden">
-<div class="card">
-<h3>Student Attendance</h3>
+    <!-- FORM (shown first) -->
+    <div id="stu-form-wrap">
+      <div class="card" style="max-width:440px;margin:0 auto">
+        <h3>Student Attendance</h3>
 
-<select id="stu-division">
-<option value="A">Division A</option>
-<option value="B">Division B</option>
-</select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label class="field-label">Division</label>
+            <select id="stu-division" onchange="previewName()">
+              <option value="A">Division A</option>
+              <option value="B">Division B</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">USN</label>
+            <input type="text" id="stu-usn" placeholder="2GI23IS001" oninput="previewName()">
+          </div>
+        </div>
 
-<input id="stu-usn" placeholder="Enter USN">
-<input id="stu-token" placeholder="Token">
+        <div class="name-preview" id="name-preview">—</div>
 
-<button id="stu-submit-btn" class="green" onclick="submitAttendance()">Submit</button>
-<div id="stu-result"></div>
+        <label class="field-label">Session Token</label>
+        <input type="text" id="stu-token" placeholder="4-digit token from board" maxlength="4">
 
-</div>
-</div>
+        <button id="stu-submit-btn" class="btn-green" style="width:100%;margin-top:4px" onclick="submitAttendance()">
+          Submit Attendance
+        </button>
 
-<div id="prof" class="hidden">
-<div class="card">
+        <div id="stu-result" class="result-msg"></div>
+      </div>
+    </div>
 
-<select id="prof-division">
-<option value="A">Division A</option>
-<option value="B">Division B</option>
-</select>
+    <!-- DONE STATE (permanent - replaces form after successful mark) -->
+    <div id="stu-success-wrap" style="display:none">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <div class="success-name" id="success-name"></div>
+        <div class="success-msg">Attendance marked successfully!</div>
+        <div class="success-cd">You may close this tab.</div>
+      </div>
+    </div>
 
-<input type="date" id="prof-date">
-<input type="time" id="prof-period">
-
-<button class="green" onclick="openSession()">Open</button>
-<button class="blue" onclick="pauseSession()">Pause</button>
-<button class="green" onclick="resumeSession()">Resume</button>
-<button class="red" onclick="closeSession()">Close</button>
-
-<h2 id="status">CLOSED</h2>
-<div id="tokenDisplay"></div>
-<div id="timer"></div>
-
-</div>
-
-<div class="card">
-<h3>Live Attendance</h3>
-<ul id="presentList"></ul>
+  </div>
 </div>
 
-<div class="card">
-<h3>Absent</h3>
-<ul id="absentList"></ul>
+<!-- ══════════ PROFESSOR ══════════ -->
+<div id="page-prof" class="page">
+  <div class="container">
+    <div class="section-title">Professor Dashboard</div>
+
+    <div class="card">
+      <h3>Session Controls</h3>
+      <div class="controls-row">
+        <div class="field">
+          <label>Division</label>
+          <select id="prof-division">
+            <option value="A">Division A</option>
+            <option value="B">Division B</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="prof-date">
+        </div>
+        <div class="field">
+          <label>Period</label>
+          <select id="prof-period">
+            <option>P1</option><option>P2</option><option>P3</option>
+            <option>P4</option><option>P5</option><option>P6</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-green"  onclick="openSession()">▶ Open</button>
+        <button class="btn-warn"   onclick="pauseSession()">⏸ Pause</button>
+        <button class="btn-accent" onclick="resumeSession()">▶ Resume</button>
+        <button class="btn-danger" onclick="closeSession()">■ Close</button>
+      </div>
+    </div>
+
+    <div class="token-display" id="token-display" style="display:none">
+      <div class="token-label">Session Token</div>
+      <div class="token-value" id="token-value">—</div>
+      <div class="timer-text"  id="timer-text">—</div>
+      <div style="margin-top:12px">
+        <span class="status-badge status-closed" id="status-badge">
+          <span class="dot"></span>CLOSED
+        </span>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="stat-present">0</div><div class="stat-lbl">Present</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-absent">0</div><div class="stat-lbl">Absent</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
+    </div>
+
+    <div class="list-grid">
+      <div class="card">
+        <h3>✅ Present</h3>
+        <ul class="student-list list-present" id="present-list"></ul>
+      </div>
+      <div class="card">
+        <h3>❌ Absent</h3>
+        <ul class="student-list list-absent" id="absent-list"></ul>
+      </div>
+    </div>
+
+    <button class="btn-blue" style="width:100%;padding:14px;font-size:14px" onclick="exportExcel()">
+      📥 Export Excel (KLS Format)
+    </button>
+  </div>
 </div>
 
+<!-- PROF PASSWORD MODAL -->
+<div class="modal-overlay" id="prof-modal">
+  <div class="modal-box">
+    <h3>🔐 Professor Access</h3>
+    <p>Enter the dashboard password</p>
+    <input type="password" id="prof-password" placeholder="Password" onkeydown="if(event.key==='Enter')checkProfPass()">
+    <div class="modal-err" id="prof-pass-err">Incorrect password</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-ghost" style="flex:1" onclick="closeProfModal()">Cancel</button>
+      <button class="btn-accent" style="flex:1" onclick="checkProfPass()">Enter</button>
+    </div>
+  </div>
 </div>
 
+<!-- FLASH CARD — professor new submission alert -->
+<div id="flash-card">
+  <div class="flash-icon">🎉</div>
+  <div>
+    <div class="flash-name" id="flash-name"></div>
+    <div class="flash-usn"  id="flash-usn"></div>
+  </div>
 </div>
 
 <script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const BIN_ID    = "69c2a5a0aa77b81da915600d";
+const API_KEY   = "$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
+const BASE      = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+const PROF_PASS = "1111";
 
-const BIN_ID="69c2a5a0aa77b81da915600d";
-const API_KEY="$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
-const BASE="https://api.jsonbin.io/v3/b/"+BIN_ID;
+let timerInterval = null;
+let pollInterval  = null;
+let timerSeconds  = 0;
+let flashTimeout  = null;
+let lastPresentSet = new Set();   // tracks USNs known to be present, to detect new ones
 
-let timerInterval;
-
-async function apiGet(){
-let r=await fetch(BASE+"/latest",{headers:{'X-Master-Key':API_KEY}});
-return (await r.json()).record;
+// ── PAGE ROUTING ──────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome() {
+  clearInterval(pollInterval);
+  showPage("page-home");
+}
+function goStudent() {
+  showPage("page-student");
+}
+function goProf() {
+  showPage("page-prof");
+  setTodayDate();
+  startPolling();
 }
 
-async function apiPut(data){
-await fetch(BASE,{method:'PUT',
-headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-body:JSON.stringify(data)});
+// ── PROF MODAL ────────────────────────────────────────────────────────────────
+function showProfModal() {
+  document.getElementById('prof-password').value = "";
+  document.getElementById('prof-pass-err').style.display = "none";
+  document.getElementById('prof-modal').classList.add('show');
+  setTimeout(() => document.getElementById('prof-password').focus(), 100);
+}
+function closeProfModal() {
+  document.getElementById('prof-modal').classList.remove('show');
+}
+function checkProfPass() {
+  if (document.getElementById('prof-password').value === PROF_PASS) {
+    closeProfModal();
+    goProf();
+  } else {
+    document.getElementById('prof-pass-err').style.display = "block";
+    document.getElementById('prof-password').value = "";
+  }
 }
 
-function hideAll(){
-login.style.display="none";
-student.style.display="none";
-prof.style.display="none";
+// ── API ───────────────────────────────────────────────────────────────────────
+async function apiGet() {
+  const r = await fetch(BASE + "/latest", { headers: { 'X-Master-Key': API_KEY } });
+  return (await r.json()).record;
+}
+async function apiPut(data) {
+  await fetch(BASE, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+    body: JSON.stringify(data)
+  });
 }
 
-function showStudent(){hideAll();student.style.display="block";}
-function showProfessor(){hideAll();prof.style.display="block";loadData();setInterval(loadData,2000);}
+// ── SESSION ───────────────────────────────────────────────────────────────────
+function randomToken() { return Math.floor(1000 + Math.random() * 9000); }
 
-function randomToken(){return Math.floor(1000+Math.random()*9000);}
-
-async function openSession(){
-let data=await apiGet();
-
-data.activeSession={
-division:document.getElementById('prof-division').value,
-date:document.getElementById('prof-date').value,
-period:document.getElementById('prof-period').value,
-token:randomToken(),
-present:[]
-};
-
-await apiPut(data);
-
-status.innerText="OPEN";
-tokenDisplay.innerText="Token: "+data.activeSession.token;
-
-startTimer();
+async function openSession() {
+  const data = await apiGet();
+  if (data.activeSession) { alert("A session is already open. Close it first."); return; }
+  const session = {
+    division: document.getElementById('prof-division').value,
+    date:     document.getElementById('prof-date').value,
+    period:   document.getElementById('prof-period').value,
+    token:    randomToken(),
+    present:  [],
+    times:    {},
+    paused:   false
+  };
+  data.activeSession = session;
+  await apiPut(data);
+  renderSession(session);
+  startTimer(300);
 }
 
-function startTimer(){
-let t=300;
-timerInterval=setInterval(()=>{
-t--;
-let m=Math.floor(t/60);
-let s=t%60;
-if(s<10)s="0"+s;
-timer.innerText="Time "+m+":"+s;
-if(t<=0) closeSession();
-},1000);
+async function pauseSession() {
+  const data = await apiGet();
+  if (!data.activeSession) return;
+  data.activeSession.paused = true;
+  await apiPut(data);
+  setStatusBadge("paused");
+  clearInterval(timerInterval);
 }
 
-async function closeSession(){
-let data=await apiGet();
-data.sessions.push(data.activeSession);
-data.activeSession=null;
-await apiPut(data);
-status.innerText="CLOSED";
-clearInterval(timerInterval);
+async function resumeSession() {
+  const data = await apiGet();
+  if (!data.activeSession) return;
+  data.activeSession.paused = false;
+  await apiPut(data);
+  setStatusBadge("open");
+  startTimer(timerSeconds);
 }
 
-async function pauseSession(){
-status.innerText="PAUSED";
+async function closeSession() {
+  if (!confirm("Close this session?")) return;
+  const data = await apiGet();
+  if (!data.activeSession) return;
+  if (!data.sessions) data.sessions = [];
+  data.sessions.push(data.activeSession);
+  data.activeSession = null;
+  await apiPut(data);
+  clearInterval(timerInterval);
+  document.getElementById('token-display').style.display = "none";
+  setStatusBadge("closed");
+  document.getElementById('present-list').innerHTML = "";
+  document.getElementById('absent-list').innerHTML  = "";
+  updateStats(0, 0, 0);
 }
 
-async function resumeSession(){
-status.innerText="OPEN";
+// ── TIMER ─────────────────────────────────────────────────────────────────────
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  timerSeconds = seconds;
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    const m = Math.floor(timerSeconds / 60);
+    const s = String(timerSeconds % 60).padStart(2, '0');
+    const el = document.getElementById('timer-text');
+    if (el) el.textContent = `⏱ ${m}:${s} remaining`;
+    if (timerSeconds <= 0) { clearInterval(timerInterval); closeSession(); }
+  }, 1000);
 }
 
-async function submitAttendance(){
-
-let data=await apiGet();
-
-let usn=document.getElementById('stu-usn').value.trim().toUpperCase();
-
-if(data.activeSession.present.includes(usn)){
-document.getElementById('stu-result').innerText="Already marked!";
-
-document.getElementById('stu-usn').disabled=true;
-document.getElementById('stu-division').disabled=true;
-document.getElementById('stu-token').disabled=true;
-document.getElementById('stu-submit-btn').disabled=true;
-
-return;
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderSession(sess) {
+  document.getElementById('token-display').style.display = "block";
+  document.getElementById('token-value').textContent = sess.token;
+  setStatusBadge(sess.paused ? "paused" : "open");
+}
+function setStatusBadge(state) {
+  const el = document.getElementById('status-badge');
+  el.className = "status-badge";
+  if (state === "open")   { el.classList.add('status-open');   el.innerHTML = '<span class="dot"></span>OPEN'; }
+  if (state === "paused") { el.classList.add('status-paused'); el.innerHTML = '<span class="dot"></span>PAUSED'; }
+  if (state === "closed") { el.classList.add('status-closed'); el.innerHTML = '<span class="dot"></span>CLOSED'; }
+}
+function updateStats(p, a, t) {
+  document.getElementById('stat-present').textContent = p;
+  document.getElementById('stat-absent').textContent  = a;
+  document.getElementById('stat-total').textContent   = t;
 }
 
-data.activeSession.present.push(usn);
-await apiPut(data);
-
-document.getElementById('stu-result').innerText="Marked!";
+function showFlash(name, usn) {
+  document.getElementById('flash-name').textContent = name;
+  document.getElementById('flash-usn').textContent  = usn + " · just marked present";
+  const card = document.getElementById('flash-card');
+  card.classList.add('show');
+  clearTimeout(flashTimeout);
+  flashTimeout = setTimeout(() => card.classList.remove('show'), 3500);
 }
 
-async function loadData(){
-let data=await apiGet();
-if(!data.activeSession) return;
+// ── POLLING ───────────────────────────────────────────────────────────────────
+function startPolling() {
+  clearInterval(pollInterval);
+  lastPresentSet = new Set();   // reset so existing present don't flash on first load
+  loadData();
+  pollInterval = setInterval(loadData, 3000);
+}
 
-let sess=data.activeSession;
+async function loadData() {
+  try {
+    const data = await apiGet();
+    if (!data.activeSession) return;
+    const sess       = data.activeSession;
+    const students   = STUDENTS[sess.division] || [];
+    const presentIds = sess.present || [];
 
-presentList.innerHTML="";
-sess.present.forEach(u=>{
-let li=document.createElement("li");
-li.innerText=u;
-presentList.appendChild(li);
+    renderSession(sess);
+
+    // Detect newly arrived students → flash card on professor screen
+    presentIds.forEach(uid => {
+      if (!lastPresentSet.has(uid)) {
+        const stu = students.find(s => s.id === uid);
+        if (stu) showFlash(stu.name, uid);
+      }
+    });
+    lastPresentSet = new Set(presentIds);
+
+    // Present list
+    const pList = document.getElementById('present-list');
+    pList.innerHTML = "";
+    presentIds.forEach(uid => {
+      const stu = students.find(s => s.id === uid);
+      const li  = document.createElement('li');
+      li.innerHTML = `<span class="usn">${uid}</span> ${stu ? stu.name : uid}`;
+      pList.appendChild(li);
+    });
+
+    // Absent list — NOTE: separate loop, NOT inside present forEach
+    const aList = document.getElementById('absent-list');
+    aList.innerHTML = "";
+    students.forEach(s => {
+      if (!presentIds.includes(s.id)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="usn">${s.id}</span> ${s.name}`;
+        aList.appendChild(li);
+      }
+    });
+
+    updateStats(presentIds.length, students.length - presentIds.length, students.length);
+  } catch(e) { /* ignore network hiccup */ }
+}
+
+// ── STUDENT ───────────────────────────────────────────────────────────────────
+function previewName() {
+  const div = document.getElementById('stu-division').value;
+  const usn = document.getElementById('stu-usn').value.trim().toUpperCase();
+  document.getElementById('stu-usn').value = usn;
+  const stu = STUDENTS[div] && STUDENTS[div].find(s => s.id === usn);
+  const el  = document.getElementById('name-preview');
+  el.textContent = stu ? stu.name : (usn ? "USN not found" : "—");
+  el.style.color = stu ? 'var(--accent2)' : 'var(--muted)';
+}
+
+function showError(msg) {
+  const el = document.getElementById('stu-result');
+  el.textContent = msg;
+  el.className   = "result-msg show result-err";
+  document.getElementById('stu-submit-btn').disabled = false;
+}
+
+// Called on success: hide form permanently, show done card — no redirect, no way back
+function showSuccessState(stuName) {
+  document.getElementById('stu-form-wrap').style.display    = "none";
+  document.getElementById('success-name').textContent       = stuName;
+  document.getElementById('stu-success-wrap').style.display = "block";
+  // Page stays here permanently — student must close the tab
+}
+
+function resetStudentForm() {
+  document.getElementById('stu-usn').value      = "";
+  document.getElementById('stu-token').value    = "";
+  document.getElementById('name-preview').textContent = "—";
+  document.getElementById('name-preview').style.color = 'var(--muted)';
+  document.getElementById('stu-result').className    = "result-msg";
+  document.getElementById('stu-submit-btn').disabled = false;
+  document.getElementById('stu-form-wrap').style.display    = "block";
+  document.getElementById('stu-success-wrap').style.display = "none";
+}
+
+async function submitAttendance() {
+  const div   = document.getElementById('stu-division').value;
+  const usn   = document.getElementById('stu-usn').value.trim().toUpperCase();
+  const token = document.getElementById('stu-token').value.trim();
+
+  if (!usn || !token) { showError("Please fill in your USN and token."); return; }
+
+  const stu = STUDENTS[div] && STUDENTS[div].find(s => s.id === usn);
+  if (!stu) { showError("USN not found in Division " + div + "."); return; }
+
+  document.getElementById('stu-submit-btn').disabled = true;
+
+  try {
+    const data = await apiGet();
+
+    if (!data.activeSession)                                     { showError("No active session. Ask your professor."); }
+    else if (data.activeSession.paused)                          { showError("Session is paused. Wait for professor."); }
+    else if (String(data.activeSession.token) !== String(token)) { showError("Wrong token — check the board."); }
+    else if (data.activeSession.division !== div)                { showError("Wrong division selected for this session."); }
+    else if (data.activeSession.present.includes(usn))           {
+      showError("⚠️ Already marked! Your attendance was recorded earlier.");
+    }
+    else {
+      data.activeSession.present = data.activeSession.present || [];
+      data.activeSession.times   = data.activeSession.times   || {};
+      data.activeSession.present.push(usn);
+      data.activeSession.times[usn] = new Date().toLocaleTimeString('en-IN');
+      await apiPut(data);
+      showSuccessState(stu.name);
+    }
+  } catch(e) {
+    showError("Network error. Please try again.");
+  }
+}
+
+// ── EXCEL EXPORT — KLS Format, all sessions as columns ───────────────────────
+// Reads all saved sessions from JSONbin + activeSession if open.
+// Each session = one date-period column. Up to 25 columns shown.
+// Layout: rows 1-4 merged header, row 5 spacer, row 6 timestamp,
+//         row 7 rotated col headers, row 8 DAY TOTAL, rows 9+ students P/A
+function exportExcel() {
+  apiGet().then(data => {
+    // Collect all sessions: saved ones + active if exists
+    let allSessions = Array.isArray(data.sessions) ? [...data.sessions] : [];
+    if (data.activeSession) allSessions.push(data.activeSession);
+
+    if (allSessions.length === 0) { alert("No sessions available to export."); return; }
+
+    // Take last 25 max, sorted by date+period
+    allSessions.sort((a, b) => {
+      const ka = (a.date || "") + (a.period || "");
+      const kb = (b.date || "") + (b.period || "");
+      return ka.localeCompare(kb);
+    });
+    if (allSessions.length > 25) allSessions = allSessions.slice(-25);
+
+    // Determine division from first session (all should be same div per export)
+    // Group by division — prompt if mixed (edge case)
+    const divisions = [...new Set(allSessions.map(s => s.division))];
+    let division = divisions[0];
+    if (divisions.length > 1) {
+      division = prompt(`Sessions span divisions: ${divisions.join(", ")}.\nEnter division to export (A or B):`) || "A";
+      allSessions = allSessions.filter(s => s.division === division);
+    }
+
+    const students = STUDENTS[division] || [];
+    const nSess    = allSessions.length;
+
+    // ── Styles ────────────────────────────────────────────────────────────
+    const S = {
+      hdrFont: (sz, bold) => ({ name:"Arial", sz, bold:!!bold, color:{rgb:"FFFFFF"} }),
+      bodyFont: { name:"Arial", sz:9 },
+      boldFont: { name:"Arial", sz:9, bold:true },
+      fill:   hex => ({ patternType:"solid", fgColor:{rgb:hex} }),
+      border: { top:{style:"thin"}, bottom:{style:"thin"}, left:{style:"thin"}, right:{style:"thin"} },
+      center: { horizontal:"center", vertical:"center" },
+      left:   { horizontal:"left",   vertical:"center" },
+      right:  { horizontal:"right",  vertical:"center" },
+      rotated:{ horizontal:"center", vertical:"bottom", textRotation:90, wrapText:true },
+    };
+
+    // Col layout: A=SI, B=USN, C=Name, D=Total, E=%, then F onwards = sessions
+    const FIXED = 5;
+    const NCOLS = FIXED + nSess;
+    const NROWS = 8 + students.length;
+
+    const ws = {};
+    const merges = [];
+
+    function C(r, c, value, style) {
+      ws[XLSX.utils.encode_cell({r, c})] = { v:value, t:typeof value==="number"?"n":"s", s:style||{} };
+    }
+    function N(r, c, value, style) {
+      ws[XLSX.utils.encode_cell({r, c})] = { v:value, t:"n", s:style||{} };
+    }
+
+    const lastColLetter = XLSX.utils.encode_col(NCOLS - 1);
+
+    // Rows 0-3: merged institution headers
+    [
+      ["KLS Gogte Institute of Technology",               14, true,  "1F3864"],
+      ["Gogte Institute of Technology, Belagavi",         11, false, "2E4D8A"],
+      ["Department of Information Science & Engineering", 10, false, "2E4D8A"],
+      [`UI Path Lab  |  ISE Dept  |  Division ${division}  |  2025-26`, 10, true, "2E4D8A"],
+    ].forEach(([txt, sz, bold, bg], ri) => {
+      C(ri, 0, txt, {
+        font: S.hdrFont(sz, bold), fill: S.fill(bg),
+        alignment: { horizontal:"center", vertical:"center" }
+      });
+      merges.push({ s:{r:ri,c:0}, e:{r:ri,c:NCOLS-1} });
+    });
+
+    // Row 5: Generated timestamp in last col
+    const now = new Date();
+    const ts  = `Generated: ${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN')}`;
+    C(5, NCOLS-1, ts, {
+      font: { name:"Arial", sz:8, italic:true, color:{rgb:"888888"} },
+      alignment: S.right
+    });
+
+    // Row 6: Column headers — fixed cols
+    ["SI","USN","Name","Total","%"].forEach((lbl, c) => {
+      C(6, c, lbl, {
+        font:S.hdrFont(9,true), fill:S.fill("2B4590"),
+        border:S.border, alignment:S.center
+      });
+    });
+    // Row 6: Session date-period headers — rotated
+    allSessions.forEach((sess, si) => {
+      // Convert yyyy-mm-dd → dd.mm.yyyy
+      const raw   = sess.date || "?";
+      const parts = raw.split("-");
+      const dLabel = parts.length === 3
+        ? `${parts[2]}.${parts[1]}.${parts[0]}`
+        : raw;
+      const label = dLabel + "\n" + (sess.period || "?");
+      C(6, FIXED + si, label, {
+        font:S.hdrFont(8,true), fill:S.fill("2B4590"),
+        border:S.border, alignment:S.rotated
+      });
+    });
+
+    // Row 7: DAY TOTAL
+    C(7, 0, "DAY TOTAL", {
+      font:{ name:"Arial", sz:10, bold:true, color:{rgb:"FFFFFF"} },
+      fill:S.fill("4A5568"), alignment:S.center
+    });
+    merges.push({ s:{r:7,c:0}, e:{r:7,c:FIXED-1} });
+    // Day totals per session
+    allSessions.forEach((sess, si) => {
+      N(7, FIXED+si, (sess.present||[]).length, {
+        font:S.boldFont, fill:S.fill("C5D9F1"),
+        border:S.border, alignment:S.center
+      });
+    });
+
+    // Rows 8+: Students
+    students.forEach((stu, i) => {
+      const row     = 8 + i;
+      const rowFill = S.fill(i % 2 === 0 ? "FFFFFF" : "EEF2FF");
+
+      // Count total present across all sessions
+      let totalPresent = 0;
+      allSessions.forEach(sess => {
+        if ((sess.present||[]).includes(stu.id)) totalPresent++;
+      });
+      const pct = nSess > 0 ? Math.round((totalPresent / nSess) * 100) : 0;
+
+      N(row, 0, i+1,         { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      C(row, 1, stu.id,      { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      C(row, 2, stu.name,    { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.left   });
+      N(row, 3, totalPresent,{ font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      N(row, 4, pct,         { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center, numFmt:"0" });
+
+      // P / A per session
+      allSessions.forEach((sess, si) => {
+        const isP = (sess.present||[]).includes(stu.id);
+        C(row, FIXED+si, isP ? "P" : "A", {
+          font:  isP
+            ? { name:"Arial", sz:9, bold:true, color:{rgb:"276221"} }
+            : { name:"Arial", sz:9, bold:true, color:{rgb:"9C0006"} },
+          fill:  S.fill(isP ? "C6EFCE" : "FFC7CE"),
+          border: S.border, alignment: S.center
+        });
+      });
+    });
+
+    // Sheet metadata
+    ws['!ref']    = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:NROWS-1,c:NCOLS-1} });
+    ws['!merges'] = merges;
+    ws['!cols']   = [
+      {wch:5},   // A SI
+      {wch:16},  // B USN
+      {wch:30},  // C Name
+      {wch:7},   // D Total
+      {wch:6},   // E %
+      ...allSessions.map(() => ({wch:6}))   // session cols
+    ];
+    ws['!rows'] = [
+      {hpt:22},{hpt:18},{hpt:16},{hpt:16},  // header rows 0-3
+      {hpt:6},                               // spacer row 4
+      {hpt:14},                              // timestamp row 5
+      {hpt:72},                              // rotated header row 6
+      {hpt:16},                              // DAY TOTAL row 7
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+
+    // Freeze rows 1-8 (header+DAY TOTAL) AND cols A-E (SI,USN,Name,Total,%)
+    // xlsx-js-style freeze: !freeze = { xSplit: cols, ySplit: rows }
+    ws['!freeze'] = { xSplit: 5, ySplit: 8 };
+
+    const dateStr = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `Attendance_UIPath_Div${division}_${dateStr}.xlsx`);
+
+  }).catch(e => { console.error(e); alert("Failed to fetch data. Try again."); });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function setTodayDate() {
+  const d   = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('prof-date').value =
+    `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (new URLSearchParams(location.search).get("prof") === "1") {
+    document.getElementById('prof-home-card').style.display = "block";
+  }
+  setTodayDate();
 });
-
-absentList.innerHTML="";
-STUDENTS[sess.division].forEach(s=>{
-if(!sess.present.includes(s.id)){
-let li=document.createElement("li");
-li.innerText=s.id+" - "+s.name;
-absentList.appendChild(li);
-}
-});
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-let p=new URLSearchParams(location.search);
-if(p.get("prof")=="1")profcard.classList.remove("hidden");
-});
-
 </script>
-
 </body>
 </html>
