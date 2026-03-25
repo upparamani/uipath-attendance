@@ -278,13 +278,13 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
     </div>
 
-    <!-- SUCCESS (shown after marking, then auto-closes) -->
+    <!-- DONE STATE (permanent - replaces form after successful mark) -->
     <div id="stu-success-wrap" style="display:none">
       <div class="success-card">
         <div class="success-icon">✅</div>
         <div class="success-name" id="success-name"></div>
         <div class="success-msg">Attendance marked successfully!</div>
-        <div class="success-cd" id="success-cd">Closing in 5s…</div>
+        <div class="success-cd">You may close this tab.</div>
       </div>
     </div>
 
@@ -379,12 +379,11 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 const BIN_ID    = "69c2a5a0aa77b81da915600d";
 const API_KEY   = "$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
 const BASE      = "https://api.jsonbin.io/v3/b/" + BIN_ID;
-const PROF_PASS = "1111";   // ← change as needed
+const PROF_PASS = "1111";
 
 let timerInterval = null;
 let pollInterval  = null;
 let timerSeconds  = 0;
-let cdInterval    = null;
 
 // ── PAGE ROUTING ──────────────────────────────────────────────────────────────
 function showPage(id) {
@@ -396,7 +395,6 @@ function goHome() {
   showPage("page-home");
 }
 function goStudent() {
-  resetStudentForm();
   showPage("page-student");
 }
 function goProf() {
@@ -586,28 +584,15 @@ function showError(msg) {
   document.getElementById('stu-submit-btn').disabled = false;
 }
 
-// Called on success: hide form, show success card, auto-close after 5s
+// Called on success: hide form permanently, show done card — no redirect, no way back
 function showSuccessState(stuName) {
-  document.getElementById('stu-form-wrap').style.display = "none";
-  document.getElementById('success-name').textContent    = stuName;
+  document.getElementById('stu-form-wrap').style.display    = "none";
+  document.getElementById('success-name').textContent       = stuName;
   document.getElementById('stu-success-wrap').style.display = "block";
-
-  let secs = 5;
-  const cdEl = document.getElementById('success-cd');
-  clearInterval(cdInterval);
-  cdInterval = setInterval(() => {
-    secs--;
-    cdEl.textContent = secs > 0 ? `Closing in ${secs}s…` : "Redirecting…";
-    if (secs <= 0) {
-      clearInterval(cdInterval);
-      resetStudentForm();
-      goHome();
-    }
-  }, 1000);
+  // Page stays here permanently — student must close the tab
 }
 
 function resetStudentForm() {
-  clearInterval(cdInterval);
   document.getElementById('stu-usn').value      = "";
   document.getElementById('stu-token').value    = "";
   document.getElementById('name-preview').textContent = "—";
@@ -651,25 +636,45 @@ async function submitAttendance() {
   }
 }
 
-// ── EXCEL EXPORT — KLS Format ─────────────────────────────────────────────────
-// Matches screenshot:  Rows 1-4 merged header, row 5 spacer, row 6 timestamp,
-// row 7 rotated column headers, row 8 DAY TOTAL, rows 9+ students P/A
+// ── EXCEL EXPORT — KLS Format, all sessions as columns ───────────────────────
+// Reads all saved sessions from JSONbin + activeSession if open.
+// Each session = one date-period column. Up to 25 columns shown.
+// Layout: rows 1-4 merged header, row 5 spacer, row 6 timestamp,
+//         row 7 rotated col headers, row 8 DAY TOTAL, rows 9+ students P/A
 function exportExcel() {
   apiGet().then(data => {
-    const sess = data.activeSession;
-    if (!sess) { alert("No active session to export."); return; }
+    // Collect all sessions: saved ones + active if exists
+    let allSessions = Array.isArray(data.sessions) ? [...data.sessions] : [];
+    if (data.activeSession) allSessions.push(data.activeSession);
 
-    const students   = STUDENTS[sess.division] || [];
-    const presentIds = sess.present || [];
-    const { division, date, period } = sess;
-    const colLabel   = date + "\n" + period;   // shown rotated in header
+    if (allSessions.length === 0) { alert("No sessions available to export."); return; }
 
-    // ── Shared styles ──────────────────────────────────────────────────────
+    // Take last 25 max, sorted by date+period
+    allSessions.sort((a, b) => {
+      const ka = (a.date || "") + (a.period || "");
+      const kb = (b.date || "") + (b.period || "");
+      return ka.localeCompare(kb);
+    });
+    if (allSessions.length > 25) allSessions = allSessions.slice(-25);
+
+    // Determine division from first session (all should be same div per export)
+    // Group by division — prompt if mixed (edge case)
+    const divisions = [...new Set(allSessions.map(s => s.division))];
+    let division = divisions[0];
+    if (divisions.length > 1) {
+      division = prompt(`Sessions span divisions: ${divisions.join(", ")}.\nEnter division to export (A or B):`) || "A";
+      allSessions = allSessions.filter(s => s.division === division);
+    }
+
+    const students = STUDENTS[division] || [];
+    const nSess    = allSessions.length;
+
+    // ── Styles ────────────────────────────────────────────────────────────
     const S = {
-      hdrFont: (sz, bold) => ({ name:"Arial", sz, bold: !!bold, color:{rgb:"FFFFFF"} }),
+      hdrFont: (sz, bold) => ({ name:"Arial", sz, bold:!!bold, color:{rgb:"FFFFFF"} }),
       bodyFont: { name:"Arial", sz:9 },
       boldFont: { name:"Arial", sz:9, bold:true },
-      fill: hex => ({ patternType:"solid", fgColor:{rgb:hex} }),
+      fill:   hex => ({ patternType:"solid", fgColor:{rgb:hex} }),
       border: { top:{style:"thin"}, bottom:{style:"thin"}, left:{style:"thin"}, right:{style:"thin"} },
       center: { horizontal:"center", vertical:"center" },
       left:   { horizontal:"left",   vertical:"center" },
@@ -677,23 +682,24 @@ function exportExcel() {
       rotated:{ horizontal:"center", vertical:"bottom", textRotation:90, wrapText:true },
     };
 
-    // Fixed cols: A=SI, B=USN, C=Name, D=Total, E=%, F=session col
+    // Col layout: A=SI, B=USN, C=Name, D=Total, E=%, then F onwards = sessions
     const FIXED = 5;
-    const SCOL  = FIXED;           // 0-indexed session column (F)
-    const NCOLS = FIXED + 1;
-    const NROWS = 8 + students.length;  // rows 0-7 header, 8+ students
+    const NCOLS = FIXED + nSess;
+    const NROWS = 8 + students.length;
 
     const ws = {};
     const merges = [];
 
-    // Helper: write a cell
-    function C(r, c, value, style, isNum) {
-      const addr = XLSX.utils.encode_cell({r, c});
-      ws[addr] = { v: value, t: isNum ? "n" : "s", s: style || {} };
+    function C(r, c, value, style) {
+      ws[XLSX.utils.encode_cell({r, c})] = { v:value, t:typeof value==="number"?"n":"s", s:style||{} };
     }
-    function N(r, c, value, style) { C(r, c, value, style, true); }
+    function N(r, c, value, style) {
+      ws[XLSX.utils.encode_cell({r, c})] = { v:value, t:"n", s:style||{} };
+    }
 
-    // ── Rows 0-3: Institution header ──────────────────────────────────────
+    const lastColLetter = XLSX.utils.encode_col(NCOLS - 1);
+
+    // Rows 0-3: merged institution headers
     [
       ["KLS Gogte Institute of Technology",               14, true,  "1F3864"],
       ["Gogte Institute of Technology, Belagavi",         11, false, "2E4D8A"],
@@ -701,74 +707,82 @@ function exportExcel() {
       [`UI Path Lab  |  ISE Dept  |  Division ${division}  |  2025-26`, 10, true, "2E4D8A"],
     ].forEach(([txt, sz, bold, bg], ri) => {
       C(ri, 0, txt, {
-        font:      S.hdrFont(sz, bold),
-        fill:      S.fill(bg),
+        font: S.hdrFont(sz, bold), fill: S.fill(bg),
         alignment: { horizontal:"center", vertical:"center" }
       });
       merges.push({ s:{r:ri,c:0}, e:{r:ri,c:NCOLS-1} });
     });
 
-    // Row 4: spacer (empty)
-
-    // Row 5: Generated timestamp at right
+    // Row 5: Generated timestamp in last col
     const now = new Date();
     const ts  = `Generated: ${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN')}`;
-    C(5, SCOL, ts, {
-      font:      { name:"Arial", sz:8, italic:true, color:{rgb:"888888"} },
+    C(5, NCOLS-1, ts, {
+      font: { name:"Arial", sz:8, italic:true, color:{rgb:"888888"} },
       alignment: S.right
     });
 
-    // Row 6: Column headers
+    // Row 6: Column headers — fixed cols
     ["SI","USN","Name","Total","%"].forEach((lbl, c) => {
       C(6, c, lbl, {
-        font: S.hdrFont(9, true), fill: S.fill("2B4590"),
-        border: S.border, alignment: S.center
+        font:S.hdrFont(9,true), fill:S.fill("2B4590"),
+        border:S.border, alignment:S.center
       });
     });
-    // Session date-period column header — rotated
-    C(6, SCOL, colLabel, {
-      font: S.hdrFont(8, true), fill: S.fill("2B4590"),
-      border: S.border, alignment: S.rotated
+    // Row 6: Session date-period headers — rotated
+    allSessions.forEach((sess, si) => {
+      const label = (sess.date || "?") + "\n" + (sess.period || "?");
+      C(6, FIXED + si, label, {
+        font:S.hdrFont(8,true), fill:S.fill("2B4590"),
+        border:S.border, alignment:S.rotated
+      });
     });
 
     // Row 7: DAY TOTAL
     C(7, 0, "DAY TOTAL", {
-      font: { name:"Arial", sz:10, bold:true, color:{rgb:"FFFFFF"} },
-      fill: S.fill("4A5568"), alignment: S.center
+      font:{ name:"Arial", sz:10, bold:true, color:{rgb:"FFFFFF"} },
+      fill:S.fill("4A5568"), alignment:S.center
     });
     merges.push({ s:{r:7,c:0}, e:{r:7,c:FIXED-1} });
-    N(7, SCOL, presentIds.length, {
-      font: S.boldFont, fill: S.fill("C5D9F1"),
-      border: S.border, alignment: S.center
+    // Day totals per session
+    allSessions.forEach((sess, si) => {
+      N(7, FIXED+si, (sess.present||[]).length, {
+        font:S.boldFont, fill:S.fill("C5D9F1"),
+        border:S.border, alignment:S.center
+      });
     });
 
-    // Rows 8+: Students (alphabetically — already sorted in students.js)
+    // Rows 8+: Students
     students.forEach((stu, i) => {
-      const row  = 8 + i;
-      const isP  = presentIds.includes(stu.id);
+      const row     = 8 + i;
       const rowFill = S.fill(i % 2 === 0 ? "FFFFFF" : "EEF2FF");
 
-      N(row, 0, i + 1, { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
-      C(row, 1, stu.id,  { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
-      C(row, 2, stu.name,{ font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.left   });
-      N(row, 3, isP ? 1 : 0, { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
-      N(row, 4, isP ? 100 : 0, {
-        font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center,
-        numFmt:"0"
+      // Count total present across all sessions
+      let totalPresent = 0;
+      allSessions.forEach(sess => {
+        if ((sess.present||[]).includes(stu.id)) totalPresent++;
       });
+      const pct = nSess > 0 ? Math.round((totalPresent / nSess) * 100) : 0;
 
-      // P / A cell
-      C(row, SCOL, isP ? "P" : "A", {
-        font:  isP
-          ? { name:"Arial", sz:9, bold:true, color:{rgb:"276221"} }
-          : { name:"Arial", sz:9, bold:true, color:{rgb:"9C0006"} },
-        fill:  S.fill(isP ? "C6EFCE" : "FFC7CE"),
-        border: S.border,
-        alignment: S.center
+      N(row, 0, i+1,         { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      C(row, 1, stu.id,      { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      C(row, 2, stu.name,    { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.left   });
+      N(row, 3, totalPresent,{ font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      N(row, 4, pct,         { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center, numFmt:"0" });
+
+      // P / A per session
+      allSessions.forEach((sess, si) => {
+        const isP = (sess.present||[]).includes(stu.id);
+        C(row, FIXED+si, isP ? "P" : "A", {
+          font:  isP
+            ? { name:"Arial", sz:9, bold:true, color:{rgb:"276221"} }
+            : { name:"Arial", sz:9, bold:true, color:{rgb:"9C0006"} },
+          fill:  S.fill(isP ? "C6EFCE" : "FFC7CE"),
+          border: S.border, alignment: S.center
+        });
       });
     });
 
-    // ── Sheet metadata ────────────────────────────────────────────────────
+    // Sheet metadata
     ws['!ref']    = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:NROWS-1,c:NCOLS-1} });
     ws['!merges'] = merges;
     ws['!cols']   = [
@@ -777,23 +791,23 @@ function exportExcel() {
       {wch:30},  // C Name
       {wch:7},   // D Total
       {wch:6},   // E %
-      {wch:6},   // F date-period
+      ...allSessions.map(() => ({wch:6}))   // session cols
     ];
     ws['!rows'] = [
-      {hpt:22}, {hpt:18}, {hpt:16}, {hpt:16},   // header rows 0-3
-      {hpt:6},                                    // spacer row 4
-      {hpt:14},                                   // timestamp row 5
-      {hpt:72},                                   // rotated header row 6
-      {hpt:16},                                   // DAY TOTAL row 7
+      {hpt:22},{hpt:18},{hpt:16},{hpt:16},  // header rows 0-3
+      {hpt:6},                               // spacer row 4
+      {hpt:14},                              // timestamp row 5
+      {hpt:72},                              // rotated header row 6
+      {hpt:16},                              // DAY TOTAL row 7
     ];
 
-    // ── Save ──────────────────────────────────────────────────────────────
-    const wb   = XLSX.utils.book_new();
+    const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Attendance");
-    const fname = `Attendance_UIPath_Div${division}_${date}_${period}.xlsx`;
-    XLSX.writeFile(wb, fname);
 
-  }).catch(() => alert("Failed to fetch session data. Try again."));
+    const dateStr = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `Attendance_UIPath_Div${division}_${dateStr}.xlsx`);
+
+  }).catch(e => { console.error(e); alert("Failed to fetch data. Try again."); });
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
