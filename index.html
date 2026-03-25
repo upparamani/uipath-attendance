@@ -33,7 +33,6 @@ body {
   min-height: 100vh;
 }
 
-/* ─── HEADER ─── */
 header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -49,29 +48,15 @@ header .logo {
   display: grid; place-items: center;
   font-family: 'Space Mono', monospace;
   font-size: 13px; font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
+  color: #fff; flex-shrink: 0;
 }
-header h2 {
-  font-size: 15px; font-weight: 600;
-  letter-spacing: 0.02em;
-}
-header span {
-  font-size: 12px; color: var(--muted);
-  font-family: 'Space Mono', monospace;
-}
+header h2 { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
 
-/* ─── LAYOUT ─── */
 .page { display: none; }
 .page.active { display: block; }
 
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 32px 16px;
-}
+.container { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
 
-/* ─── CARDS ─── */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -80,15 +65,11 @@ header span {
   margin-bottom: 20px;
 }
 .card h3 {
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin-bottom: 20px;
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin-bottom: 20px;
 }
 
-/* ─── FORM ELEMENTS ─── */
 select, input[type="text"], input[type="date"], input[type="password"] {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -102,17 +83,12 @@ select, input[type="text"], input[type="date"], input[type="password"] {
   transition: border-color 0.2s;
   outline: none;
 }
-select:focus, input:focus {
-  border-color: var(--accent);
-}
+select:focus, input:focus { border-color: var(--accent); }
 
-/* ─── BUTTONS ─── */
 button {
   font-family: 'Sora', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  border: none; border-radius: 8px;
   padding: 10px 18px;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
@@ -128,7 +104,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .btn-blue    { background: var(--blue);    color: #fff; }
 
-/* ─── HOME PAGE ─── */
+/* HOME */
 .home-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -147,260 +123,96 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   cursor: pointer;
   transition: border-color 0.2s, transform 0.15s;
 }
-.home-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
-}
-.home-card .icon {
-  font-size: 36px;
-  margin-bottom: 16px;
-}
+.home-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.home-card .icon { font-size: 36px; margin-bottom: 16px; }
 .home-card h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text);
-  text-transform: none;
-  letter-spacing: 0;
+  font-size: 16px; font-weight: 700;
+  margin-bottom: 8px; color: var(--text);
+  text-transform: none; letter-spacing: 0;
 }
-.home-card p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 20px;
-}
+.home-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
 
-/* ─── STATUS BADGE ─── */
+/* STATUS BADGE */
 .status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
   font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
 }
-.status-badge .dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-}
+.status-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .status-open   { background: rgba(34,211,165,0.12); color: var(--green); }
 .status-closed { background: rgba(104,104,160,0.15); color: var(--muted); }
-.status-paused { background: rgba(245,201,91,0.12); color: var(--warn); }
+.status-paused { background: rgba(245,201,91,0.12);  color: var(--warn); }
 
-/* ─── PROF CONTROLS ROW ─── */
-.controls-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-end;
-  margin-bottom: 20px;
-}
-.controls-row .field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-width: 120px;
-}
-.controls-row .field label {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-}
-.controls-row select,
-.controls-row input[type="date"] {
-  margin-bottom: 0;
-}
-.btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-}
+/* PROF CONTROLS */
+.controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
+.controls-row .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+.controls-row .field label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.controls-row select, .controls-row input[type="date"] { margin-bottom: 0; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
-/* ─── TOKEN DISPLAY ─── */
+/* TOKEN */
 .token-display {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  margin: 16px 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; text-align: center; margin: 16px 0;
 }
-.token-display .token-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.token-display .token-value {
-  font-family: 'Space Mono', monospace;
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--accent2);
-  letter-spacing: 0.1em;
-}
-.token-display .timer-text {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 6px;
-}
+.token-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.token-value { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; color: var(--accent2); letter-spacing: 0.1em; }
+.timer-text  { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); margin-top: 6px; }
 
-/* ─── STATS ROW ─── */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.stat-box {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  text-align: center;
-}
-.stat-box .stat-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--accent2);
-}
-.stat-box .stat-lbl {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-top: 4px;
-}
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-num { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--accent2); }
+.stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
 
-/* ─── LISTS ─── */
-.student-list {
-  list-style: none;
-  max-height: 300px;
-  overflow-y: auto;
-}
-.student-list li {
-  padding: 9px 12px;
-  border-radius: 7px;
-  font-size: 13px;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* LISTS */
+.student-list { list-style: none; max-height: 300px; overflow-y: auto; }
+.student-list li { padding: 9px 12px; border-radius: 7px; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
 .student-list li:nth-child(odd) { background: rgba(255,255,255,0.03); }
-.student-list li .usn {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: var(--muted);
-  flex-shrink: 0;
-}
+.student-list li .usn { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; }
 .list-present li { border-left: 3px solid var(--green); }
 .list-absent  li { border-left: 3px solid var(--danger); }
-
-/* ─── TWO COLUMN LIST GRID ─── */
-.list-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+.list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media(max-width:640px){ .list-grid { grid-template-columns: 1fr; } }
 
-/* ─── NAME PREVIEW ─── */
-.name-preview {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent2);
-  min-height: 22px;
-  margin-bottom: 8px;
-}
-
-/* ─── RESULT MSG ─── */
-.result-msg {
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  margin-top: 12px;
+/* STUDENT SUCCESS STATE */
+.success-card {
+  background: rgba(34,211,165,0.08);
+  border: 1px solid rgba(34,211,165,0.3);
+  border-radius: 14px;
+  padding: 56px 28px;
   text-align: center;
-  display: none;
+  max-width: 440px;
+  margin: 0 auto;
+  animation: fadeUp 0.35s ease;
 }
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.success-icon  { font-size: 64px; margin-bottom: 20px; }
+.success-name  { font-size: 22px; font-weight: 700; color: var(--accent2); margin-bottom: 8px; }
+.success-msg   { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+.success-cd    { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); }
+
+/* ERROR MSG */
+.result-msg { padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-top: 12px; text-align: center; display: none; }
 .result-msg.show { display: block; }
-.result-ok     { background: rgba(34,211,165,0.12); color: var(--green); border: 1px solid rgba(34,211,165,0.3); }
-.result-err    { background: rgba(245,91,91,0.12);  color: var(--danger); border: 1px solid rgba(245,91,91,0.3); }
+.result-err  { background: rgba(245,91,91,0.12); color: var(--danger); border: 1px solid rgba(245,91,91,0.3); }
 
-/* ─── MODAL ─── */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(6,6,16,0.85);
-  display: none;
-  place-items: center;
-  z-index: 100;
-  backdrop-filter: blur(4px);
-}
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(6,6,16,0.85); display: none; place-items: center; z-index: 100; backdrop-filter: blur(4px); }
 .modal-overlay.show { display: grid; }
-.modal-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 36px;
-  width: 320px;
-  text-align: center;
-}
-.modal-box h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--text);
-  text-transform: none;
-  letter-spacing: 0;
-}
-.modal-box p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 20px;
-}
-.modal-box input {
-  margin-bottom: 16px;
-}
-.modal-err {
-  color: var(--danger);
-  font-size: 12px;
-  margin-top: -8px;
-  margin-bottom: 12px;
-  display: none;
-}
+.modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: 320px; text-align: center; }
+.modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--text); text-transform: none; letter-spacing: 0; }
+.modal-box p  { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+.modal-box input { margin-bottom: 16px; }
+.modal-err { color: var(--danger); font-size: 12px; margin-top: -8px; margin-bottom: 12px; display: none; }
 
-/* ─── BACK BTN ─── */
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--muted);
-  cursor: pointer;
-  margin-bottom: 20px;
-  background: none;
-  border: none;
-  padding: 0;
-  font-family: 'Sora', sans-serif;
-}
-.back-btn:hover { color: var(--text); }
-
-/* ─── SECTION TITLE ─── */
-.section-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+.field-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px; font-weight: 600; }
+.name-preview { font-size: 14px; font-weight: 600; min-height: 22px; margin-bottom: 8px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -410,7 +222,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   <h2>ISE Dept · UI Path Lab Attendance</h2>
 </header>
 
-<!-- ═══════════════ HOME ═══════════════ -->
+<!-- ══════════ HOME ══════════ -->
 <div id="page-home" class="page active">
   <div class="container">
     <div class="home-grid">
@@ -430,48 +242,60 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   </div>
 </div>
 
-<!-- ═══════════════ STUDENT ═══════════════ -->
+<!-- ══════════ STUDENT ══════════ -->
 <div id="page-student" class="page">
   <div class="container">
-    <button class="back-btn" onclick="goHome()">← Back</button>
-    <div class="section-title">Mark Attendance</div>
 
-    <div class="card" style="max-width:440px;margin:0 auto">
-      <h3>Your Details</h3>
+    <!-- FORM (shown first) -->
+    <div id="stu-form-wrap">
+      <div class="card" style="max-width:440px;margin:0 auto">
+        <h3>Student Attendance</h3>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Division</label>
-          <select id="stu-division" onchange="previewName()">
-            <option value="A">Division A</option>
-            <option value="B">Division B</option>
-          </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label class="field-label">Division</label>
+            <select id="stu-division" onchange="previewName()">
+              <option value="A">Division A</option>
+              <option value="B">Division B</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">USN</label>
+            <input type="text" id="stu-usn" placeholder="2GI23IS001" oninput="previewName()">
+          </div>
         </div>
-        <div>
-          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">USN</label>
-          <input type="text" id="stu-usn" placeholder="2GI23IS001" oninput="previewName()" style="text-transform:uppercase">
-        </div>
+
+        <div class="name-preview" id="name-preview">—</div>
+
+        <label class="field-label">Session Token</label>
+        <input type="text" id="stu-token" placeholder="4-digit token from board" maxlength="4">
+
+        <button id="stu-submit-btn" class="btn-green" style="width:100%;margin-top:4px" onclick="submitAttendance()">
+          Submit Attendance
+        </button>
+
+        <div id="stu-result" class="result-msg"></div>
       </div>
-
-      <div class="name-preview" id="name-preview">—</div>
-
-      <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Session Token</label>
-      <input type="text" id="stu-token" placeholder="4-digit token from board" maxlength="4">
-
-      <button id="stu-submit-btn" class="btn-green" style="width:100%;margin-top:4px" onclick="submitAttendance()">Submit Attendance</button>
-
-      <div id="stu-result" class="result-msg"></div>
     </div>
+
+    <!-- SUCCESS (shown after marking, then auto-closes) -->
+    <div id="stu-success-wrap" style="display:none">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <div class="success-name" id="success-name"></div>
+        <div class="success-msg">Attendance marked successfully!</div>
+        <div class="success-cd" id="success-cd">Closing in 5s…</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- ═══════════════ PROFESSOR ═══════════════ -->
+<!-- ══════════ PROFESSOR ══════════ -->
 <div id="page-prof" class="page">
   <div class="container">
-    <button class="back-btn" onclick="goHome()">← Back</button>
     <div class="section-title">Professor Dashboard</div>
 
-    <!-- Controls -->
     <div class="card">
       <h3>Session Controls</h3>
       <div class="controls-row">
@@ -502,35 +326,23 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
     </div>
 
-    <!-- Token + Status -->
     <div class="token-display" id="token-display" style="display:none">
       <div class="token-label">Session Token</div>
       <div class="token-value" id="token-value">—</div>
-      <div class="timer-text" id="timer-text">—</div>
-      <div style="margin-top:12px" id="status-badge-wrap">
+      <div class="timer-text"  id="timer-text">—</div>
+      <div style="margin-top:12px">
         <span class="status-badge status-closed" id="status-badge">
           <span class="dot"></span>CLOSED
         </span>
       </div>
     </div>
 
-    <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-num" id="stat-present">0</div>
-        <div class="stat-lbl">Present</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="stat-absent">0</div>
-        <div class="stat-lbl">Absent</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="stat-total">0</div>
-        <div class="stat-lbl">Total</div>
-      </div>
+      <div class="stat-box"><div class="stat-num" id="stat-present">0</div><div class="stat-lbl">Present</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-absent">0</div><div class="stat-lbl">Absent</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Total</div></div>
     </div>
 
-    <!-- Lists -->
     <div class="list-grid">
       <div class="card">
         <h3>✅ Present</h3>
@@ -543,16 +355,16 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     </div>
 
     <button class="btn-blue" style="width:100%;padding:14px;font-size:14px" onclick="exportExcel()">
-      📥 Export Excel
+      📥 Export Excel (KLS Format)
     </button>
   </div>
 </div>
 
-<!-- ═══════════════ PROF PASSWORD MODAL ═══════════════ -->
+<!-- PROF PASSWORD MODAL -->
 <div class="modal-overlay" id="prof-modal">
   <div class="modal-box">
     <h3>🔐 Professor Access</h3>
-    <p>Enter the dashboard password to continue</p>
+    <p>Enter the dashboard password</p>
     <input type="password" id="prof-password" placeholder="Password" onkeydown="if(event.key==='Enter')checkProfPass()">
     <div class="modal-err" id="prof-pass-err">Incorrect password</div>
     <div style="display:flex;gap:10px">
@@ -563,34 +375,37 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 </div>
 
 <script>
-// ─── CONFIG ───
-const BIN_ID  = "69c2a5a0aa77b81da915600d";
-const API_KEY = "$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
-const BASE    = "https://api.jsonbin.io/v3/b/" + BIN_ID;
-const PROF_PASS = "1111"; // ← change as needed
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const BIN_ID    = "69c2a5a0aa77b81da915600d";
+const API_KEY   = "$2a$10$0r2BZmxFrzU01uqwZWEyeuWkt1cugfUAo3I4ze0RlCRsyjNXZEuFW";
+const BASE      = "https://api.jsonbin.io/v3/b/" + BIN_ID;
+const PROF_PASS = "1111";   // ← change as needed
 
 let timerInterval = null;
 let pollInterval  = null;
 let timerSeconds  = 0;
+let cdInterval    = null;
 
-// ─── ROUTING ───
+// ── PAGE ROUTING ──────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 function goHome() {
   clearInterval(pollInterval);
   showPage("page-home");
 }
-function goStudent() { showPage("page-student"); }
+function goStudent() {
+  resetStudentForm();
+  showPage("page-student");
+}
 function goProf() {
   showPage("page-prof");
   setTodayDate();
   startPolling();
 }
 
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ─── PROF MODAL ───
+// ── PROF MODAL ────────────────────────────────────────────────────────────────
 function showProfModal() {
   document.getElementById('prof-password').value = "";
   document.getElementById('prof-pass-err').style.display = "none";
@@ -601,8 +416,7 @@ function closeProfModal() {
   document.getElementById('prof-modal').classList.remove('show');
 }
 function checkProfPass() {
-  const v = document.getElementById('prof-password').value;
-  if (v === PROF_PASS) {
+  if (document.getElementById('prof-password').value === PROF_PASS) {
     closeProfModal();
     goProf();
   } else {
@@ -611,11 +425,9 @@ function checkProfPass() {
   }
 }
 
-// ─── API ───
+// ── API ───────────────────────────────────────────────────────────────────────
 async function apiGet() {
-  const r = await fetch(BASE + "/latest", {
-    headers: { 'X-Master-Key': API_KEY }
-  });
+  const r = await fetch(BASE + "/latest", { headers: { 'X-Master-Key': API_KEY } });
   return (await r.json()).record;
 }
 async function apiPut(data) {
@@ -626,23 +438,21 @@ async function apiPut(data) {
   });
 }
 
-// ─── SESSION ───
+// ── SESSION ───────────────────────────────────────────────────────────────────
 function randomToken() { return Math.floor(1000 + Math.random() * 9000); }
 
 async function openSession() {
   const data = await apiGet();
   if (data.activeSession) { alert("A session is already open. Close it first."); return; }
-
   const session = {
-    division : document.getElementById('prof-division').value,
-    date     : document.getElementById('prof-date').value,
-    period   : document.getElementById('prof-period').value,
-    token    : randomToken(),
-    present  : [],
-    times    : {},
-    paused   : false
+    division: document.getElementById('prof-division').value,
+    date:     document.getElementById('prof-date').value,
+    period:   document.getElementById('prof-period').value,
+    token:    randomToken(),
+    present:  [],
+    times:    {},
+    paused:   false
   };
-
   data.activeSession = session;
   await apiPut(data);
   renderSession(session);
@@ -683,7 +493,7 @@ async function closeSession() {
   updateStats(0, 0, 0);
 }
 
-// ─── TIMER ───
+// ── TIMER ─────────────────────────────────────────────────────────────────────
 function startTimer(seconds) {
   clearInterval(timerInterval);
   timerSeconds = seconds;
@@ -691,19 +501,18 @@ function startTimer(seconds) {
     timerSeconds--;
     const m = Math.floor(timerSeconds / 60);
     const s = String(timerSeconds % 60).padStart(2, '0');
-    document.getElementById('timer-text').textContent = `⏱ ${m}:${s} remaining`;
+    const el = document.getElementById('timer-text');
+    if (el) el.textContent = `⏱ ${m}:${s} remaining`;
     if (timerSeconds <= 0) { clearInterval(timerInterval); closeSession(); }
   }, 1000);
 }
 
-// ─── RENDER ───
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderSession(sess) {
   document.getElementById('token-display').style.display = "block";
   document.getElementById('token-value').textContent = sess.token;
-  if (sess.paused) setStatusBadge("paused");
-  else setStatusBadge("open");
+  setStatusBadge(sess.paused ? "paused" : "open");
 }
-
 function setStatusBadge(state) {
   const el = document.getElementById('status-badge');
   el.className = "status-badge";
@@ -711,14 +520,13 @@ function setStatusBadge(state) {
   if (state === "paused") { el.classList.add('status-paused'); el.innerHTML = '<span class="dot"></span>PAUSED'; }
   if (state === "closed") { el.classList.add('status-closed'); el.innerHTML = '<span class="dot"></span>CLOSED'; }
 }
-
-function updateStats(present, absent, total) {
-  document.getElementById('stat-present').textContent = present;
-  document.getElementById('stat-absent').textContent  = absent;
-  document.getElementById('stat-total').textContent   = total;
+function updateStats(p, a, t) {
+  document.getElementById('stat-present').textContent = p;
+  document.getElementById('stat-absent').textContent  = a;
+  document.getElementById('stat-total').textContent   = t;
 }
 
-// ─── POLLING ───
+// ── POLLING ───────────────────────────────────────────────────────────────────
 function startPolling() {
   clearInterval(pollInterval);
   loadData();
@@ -729,12 +537,11 @@ async function loadData() {
   try {
     const data = await apiGet();
     if (!data.activeSession) return;
-
-    const sess = data.activeSession;
-    renderSession(sess);
-
-    const students  = STUDENTS[sess.division] || [];
+    const sess       = data.activeSession;
+    const students   = STUDENTS[sess.division] || [];
     const presentIds = sess.present || [];
+
+    renderSession(sess);
 
     // Present list
     const pList = document.getElementById('present-list');
@@ -746,7 +553,7 @@ async function loadData() {
       pList.appendChild(li);
     });
 
-    // Absent list  ← BUG FIX: was inside present forEach before
+    // Absent list — NOTE: separate loop, NOT inside present forEach
     const aList = document.getElementById('absent-list');
     aList.innerHTML = "";
     students.forEach(s => {
@@ -758,22 +565,57 @@ async function loadData() {
     });
 
     updateStats(presentIds.length, students.length - presentIds.length, students.length);
-  } catch(e) { /* network hiccup, retry next poll */ }
+  } catch(e) { /* ignore network hiccup */ }
 }
 
-// ─── STUDENT ───
+// ── STUDENT ───────────────────────────────────────────────────────────────────
 function previewName() {
   const div = document.getElementById('stu-division').value;
   const usn = document.getElementById('stu-usn').value.trim().toUpperCase();
+  document.getElementById('stu-usn').value = usn;
   const stu = STUDENTS[div] && STUDENTS[div].find(s => s.id === usn);
-  document.getElementById('name-preview').textContent = stu ? stu.name : (usn ? "USN not found" : "—");
-  document.getElementById('name-preview').style.color = stu ? 'var(--accent2)' : 'var(--muted)';
+  const el  = document.getElementById('name-preview');
+  el.textContent = stu ? stu.name : (usn ? "USN not found" : "—");
+  el.style.color = stu ? 'var(--accent2)' : 'var(--muted)';
 }
 
-function showResult(msg, ok) {
+function showError(msg) {
   const el = document.getElementById('stu-result');
-  el.textContent  = msg;
-  el.className    = "result-msg show " + (ok ? "result-ok" : "result-err");
+  el.textContent = msg;
+  el.className   = "result-msg show result-err";
+  document.getElementById('stu-submit-btn').disabled = false;
+}
+
+// Called on success: hide form, show success card, auto-close after 5s
+function showSuccessState(stuName) {
+  document.getElementById('stu-form-wrap').style.display = "none";
+  document.getElementById('success-name').textContent    = stuName;
+  document.getElementById('stu-success-wrap').style.display = "block";
+
+  let secs = 5;
+  const cdEl = document.getElementById('success-cd');
+  clearInterval(cdInterval);
+  cdInterval = setInterval(() => {
+    secs--;
+    cdEl.textContent = secs > 0 ? `Closing in ${secs}s…` : "Redirecting…";
+    if (secs <= 0) {
+      clearInterval(cdInterval);
+      resetStudentForm();
+      goHome();
+    }
+  }, 1000);
+}
+
+function resetStudentForm() {
+  clearInterval(cdInterval);
+  document.getElementById('stu-usn').value      = "";
+  document.getElementById('stu-token').value    = "";
+  document.getElementById('name-preview').textContent = "—";
+  document.getElementById('name-preview').style.color = 'var(--muted)';
+  document.getElementById('stu-result').className    = "result-msg";
+  document.getElementById('stu-submit-btn').disabled = false;
+  document.getElementById('stu-form-wrap').style.display    = "block";
+  document.getElementById('stu-success-wrap').style.display = "none";
 }
 
 async function submitAttendance() {
@@ -781,121 +623,189 @@ async function submitAttendance() {
   const usn   = document.getElementById('stu-usn').value.trim().toUpperCase();
   const token = document.getElementById('stu-token').value.trim();
 
-  if (!usn || !token) { showResult("Please fill in USN and token.", false); return; }
+  if (!usn || !token) { showError("Please fill in your USN and token."); return; }
 
   const stu = STUDENTS[div] && STUDENTS[div].find(s => s.id === usn);
-  if (!stu) { showResult("USN not found in " + div + " division.", false); return; }
+  if (!stu) { showError("USN not found in Division " + div + "."); return; }
 
   document.getElementById('stu-submit-btn').disabled = true;
 
   try {
     const data = await apiGet();
-    if (!data.activeSession)              { showResult("No active session.", false); }
-    else if (data.activeSession.paused)   { showResult("Session is paused. Wait for professor.", false); }
-    else if (String(data.activeSession.token) !== String(token)) { showResult("Wrong token. Check the board.", false); }
-    else if (data.activeSession.division !== div)  { showResult("Wrong division selected.", false); }
-    else if (data.activeSession.present.includes(usn)) { showResult("Already marked present! ✓", true); }
+
+    if (!data.activeSession)                                     { showError("No active session. Ask your professor."); }
+    else if (data.activeSession.paused)                          { showError("Session is paused. Wait for professor."); }
+    else if (String(data.activeSession.token) !== String(token)) { showError("Wrong token — check the board."); }
+    else if (data.activeSession.division !== div)                { showError("Wrong division selected for this session."); }
+    else if (data.activeSession.present.includes(usn))           { showSuccessState(stu.name); } // already marked = success
     else {
+      data.activeSession.present = data.activeSession.present || [];
+      data.activeSession.times   = data.activeSession.times   || {};
       data.activeSession.present.push(usn);
       data.activeSession.times[usn] = new Date().toLocaleTimeString('en-IN');
       await apiPut(data);
-      showResult("✓ Attendance marked for " + stu.name, true);
+      showSuccessState(stu.name);
     }
   } catch(e) {
-    showResult("Network error. Try again.", false);
+    showError("Network error. Please try again.");
   }
-
-  document.getElementById('stu-submit-btn').disabled = false;
 }
 
-// ─── EXPORT EXCEL ───
+// ── EXCEL EXPORT — KLS Format ─────────────────────────────────────────────────
+// Matches screenshot:  Rows 1-4 merged header, row 5 spacer, row 6 timestamp,
+// row 7 rotated column headers, row 8 DAY TOTAL, rows 9+ students P/A
 function exportExcel() {
-  // Collect last closed session or prompt for a saved session
-  const pick = prompt("Export which?\n1 = Active session\n2 = Cancel");
-  if (pick !== "1") return;
-
   apiGet().then(data => {
     const sess = data.activeSession;
     if (!sess) { alert("No active session to export."); return; }
 
-    const students  = STUDENTS[sess.division] || [];
-    const wb = XLSX.utils.book_new();
+    const students   = STUDENTS[sess.division] || [];
+    const presentIds = sess.present || [];
+    const { division, date, period } = sess;
+    const colLabel   = date + "\n" + period;   // shown rotated in header
 
-    // Sheet: Attendance
-    const rows = [["USN", "Name", "Status", "Time"]];
-    students.forEach(s => {
-      const present = sess.present.includes(s.id);
-      rows.push([
-        s.id,
-        s.name,
-        present ? "Present" : "Absent",
-        present ? (sess.times[s.id] || "—") : ""
-      ]);
-    });
+    // ── Shared styles ──────────────────────────────────────────────────────
+    const S = {
+      hdrFont: (sz, bold) => ({ name:"Arial", sz, bold: !!bold, color:{rgb:"FFFFFF"} }),
+      bodyFont: { name:"Arial", sz:9 },
+      boldFont: { name:"Arial", sz:9, bold:true },
+      fill: hex => ({ patternType:"solid", fgColor:{rgb:hex} }),
+      border: { top:{style:"thin"}, bottom:{style:"thin"}, left:{style:"thin"}, right:{style:"thin"} },
+      center: { horizontal:"center", vertical:"center" },
+      left:   { horizontal:"left",   vertical:"center" },
+      right:  { horizontal:"right",  vertical:"center" },
+      rotated:{ horizontal:"center", vertical:"bottom", textRotation:90, wrapText:true },
+    };
 
-    const ws = XLSX.utils.aoa_to_sheet(rows);
+    // Fixed cols: A=SI, B=USN, C=Name, D=Total, E=%, F=session col
+    const FIXED = 5;
+    const SCOL  = FIXED;           // 0-indexed session column (F)
+    const NCOLS = FIXED + 1;
+    const NROWS = 8 + students.length;  // rows 0-7 header, 8+ students
 
-    // Style header
-    ["A1","B1","C1","D1"].forEach(cell => {
-      if (ws[cell]) ws[cell].s = {
-        fill: { fgColor: { rgb: "1a1a50" } },
-        font: { bold: true, color: { rgb: "FFFFFF" } }
-      };
-    });
+    const ws = {};
+    const merges = [];
 
-    // Color rows
-    for (let r = 2; r <= students.length + 1; r++) {
-      const cellC = "C" + r;
-      if (ws[cellC]) {
-        const isP = ws[cellC].v === "Present";
-        ["A","B","C","D"].forEach(col => {
-          const c = col + r;
-          if (ws[c]) ws[c].s = {
-            fill: { fgColor: { rgb: isP ? "e6fff8" : "fff0f0" } }
-          };
-        });
-      }
+    // Helper: write a cell
+    function C(r, c, value, style, isNum) {
+      const addr = XLSX.utils.encode_cell({r, c});
+      ws[addr] = { v: value, t: isNum ? "n" : "s", s: style || {} };
     }
+    function N(r, c, value, style) { C(r, c, value, style, true); }
 
-    ws['!cols'] = [{wch:16},{wch:30},{wch:10},{wch:12}];
+    // ── Rows 0-3: Institution header ──────────────────────────────────────
+    [
+      ["KLS Gogte Institute of Technology",               14, true,  "1F3864"],
+      ["Gogte Institute of Technology, Belagavi",         11, false, "2E4D8A"],
+      ["Department of Information Science & Engineering", 10, false, "2E4D8A"],
+      [`UI Path Lab  |  ISE Dept  |  Division ${division}  |  2025-26`, 10, true, "2E4D8A"],
+    ].forEach(([txt, sz, bold, bg], ri) => {
+      C(ri, 0, txt, {
+        font:      S.hdrFont(sz, bold),
+        fill:      S.fill(bg),
+        alignment: { horizontal:"center", vertical:"center" }
+      });
+      merges.push({ s:{r:ri,c:0}, e:{r:ri,c:NCOLS-1} });
+    });
 
-    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+    // Row 4: spacer (empty)
 
-    // Summary sheet
-    const present = sess.present.length;
-    const total   = students.length;
-    const sumRows = [
-      ["Summary",""],
-      ["Division", sess.division],
-      ["Date",     sess.date],
-      ["Period",   sess.period],
-      ["Present",  present],
-      ["Absent",   total - present],
-      ["Total",    total],
-      ["% Attendance", ((present/total)*100).toFixed(1)+"%"]
+    // Row 5: Generated timestamp at right
+    const now = new Date();
+    const ts  = `Generated: ${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN')}`;
+    C(5, SCOL, ts, {
+      font:      { name:"Arial", sz:8, italic:true, color:{rgb:"888888"} },
+      alignment: S.right
+    });
+
+    // Row 6: Column headers
+    ["SI","USN","Name","Total","%"].forEach((lbl, c) => {
+      C(6, c, lbl, {
+        font: S.hdrFont(9, true), fill: S.fill("2B4590"),
+        border: S.border, alignment: S.center
+      });
+    });
+    // Session date-period column header — rotated
+    C(6, SCOL, colLabel, {
+      font: S.hdrFont(8, true), fill: S.fill("2B4590"),
+      border: S.border, alignment: S.rotated
+    });
+
+    // Row 7: DAY TOTAL
+    C(7, 0, "DAY TOTAL", {
+      font: { name:"Arial", sz:10, bold:true, color:{rgb:"FFFFFF"} },
+      fill: S.fill("4A5568"), alignment: S.center
+    });
+    merges.push({ s:{r:7,c:0}, e:{r:7,c:FIXED-1} });
+    N(7, SCOL, presentIds.length, {
+      font: S.boldFont, fill: S.fill("C5D9F1"),
+      border: S.border, alignment: S.center
+    });
+
+    // Rows 8+: Students (alphabetically — already sorted in students.js)
+    students.forEach((stu, i) => {
+      const row  = 8 + i;
+      const isP  = presentIds.includes(stu.id);
+      const rowFill = S.fill(i % 2 === 0 ? "FFFFFF" : "EEF2FF");
+
+      N(row, 0, i + 1, { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      C(row, 1, stu.id,  { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      C(row, 2, stu.name,{ font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.left   });
+      N(row, 3, isP ? 1 : 0, { font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center });
+      N(row, 4, isP ? 100 : 0, {
+        font:S.bodyFont, fill:rowFill, border:S.border, alignment:S.center,
+        numFmt:"0"
+      });
+
+      // P / A cell
+      C(row, SCOL, isP ? "P" : "A", {
+        font:  isP
+          ? { name:"Arial", sz:9, bold:true, color:{rgb:"276221"} }
+          : { name:"Arial", sz:9, bold:true, color:{rgb:"9C0006"} },
+        fill:  S.fill(isP ? "C6EFCE" : "FFC7CE"),
+        border: S.border,
+        alignment: S.center
+      });
+    });
+
+    // ── Sheet metadata ────────────────────────────────────────────────────
+    ws['!ref']    = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:NROWS-1,c:NCOLS-1} });
+    ws['!merges'] = merges;
+    ws['!cols']   = [
+      {wch:5},   // A SI
+      {wch:16},  // B USN
+      {wch:30},  // C Name
+      {wch:7},   // D Total
+      {wch:6},   // E %
+      {wch:6},   // F date-period
     ];
-    const ws2 = XLSX.utils.aoa_to_sheet(sumRows);
-    ws2['!cols'] = [{wch:20},{wch:20}];
-    XLSX.utils.book_append_sheet(wb, ws2, "Summary");
+    ws['!rows'] = [
+      {hpt:22}, {hpt:18}, {hpt:16}, {hpt:16},   // header rows 0-3
+      {hpt:6},                                    // spacer row 4
+      {hpt:14},                                   // timestamp row 5
+      {hpt:72},                                   // rotated header row 6
+      {hpt:16},                                   // DAY TOTAL row 7
+    ];
 
-    const fname = `Attendance_UIPath_Div${sess.division}_${sess.date}_${sess.period}.xlsx`;
+    // ── Save ──────────────────────────────────────────────────────────────
+    const wb   = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+    const fname = `Attendance_UIPath_Div${division}_${date}_${period}.xlsx`;
     XLSX.writeFile(wb, fname);
-  });
+
+  }).catch(() => alert("Failed to fetch session data. Try again."));
 }
 
-// ─── INIT ───
+// ── INIT ──────────────────────────────────────────────────────────────────────
 function setTodayDate() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const day = String(d.getDate()).padStart(2,'0');
-  document.getElementById('prof-date').value = `${y}-${m}-${day}`;
+  const d   = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('prof-date').value =
+    `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Show prof card if ?prof=1
-  const p = new URLSearchParams(location.search);
-  if (p.get("prof") === "1") {
+  if (new URLSearchParams(location.search).get("prof") === "1") {
     document.getElementById('prof-home-card').style.display = "block";
   }
   setTodayDate();
