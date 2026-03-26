@@ -70,7 +70,7 @@ header h2 { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
   color: var(--muted); margin-bottom: 20px;
 }
 
-select, input[type="text"], input[type="date"], input[type="password"] {
+select, input[type="text"], input[type="date"], input[type="time"], input[type="password"] {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -148,7 +148,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .controls-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
 .controls-row .field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
 .controls-row .field label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
-.controls-row select, .controls-row input[type="date"] { margin-bottom: 0; }
+.controls-row select, .controls-row input[type="date"], .controls-row input[type="time"] { margin-bottom: 0; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
 /* TOKEN */
@@ -331,11 +331,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
           <input type="date" id="prof-date">
         </div>
         <div class="field">
-          <label>Period</label>
-          <select id="prof-period">
-            <option>P1</option><option>P2</option><option>P3</option>
-            <option>P4</option><option>P5</option><option>P6</option>
-          </select>
+          <label>Period Time</label>
+          <input type="time" id="prof-period" style="margin-bottom:0">
         </div>
       </div>
       <div class="btn-row">
@@ -643,6 +640,9 @@ function showSuccessState(stuName) {
 }
 
 function resetStudentForm() {
+  document.getElementById('stu-division').disabled = false;
+  document.getElementById('stu-usn').disabled      = false;
+  document.getElementById('stu-token').disabled    = false;
   document.getElementById('stu-usn').value      = "";
   document.getElementById('stu-token').value    = "";
   document.getElementById('name-preview').textContent = "—";
@@ -673,6 +673,10 @@ async function submitAttendance() {
     else if (String(data.activeSession.token) !== String(token)) { showError("Wrong token — check the board."); }
     else if (data.activeSession.division !== div)                { showError("Wrong division selected for this session."); }
     else if (data.activeSession.present.includes(usn))           {
+      // Disable inputs so student cannot try a different USN
+      document.getElementById('stu-division').disabled = true;
+      document.getElementById('stu-usn').disabled      = true;
+      document.getElementById('stu-token').disabled    = true;
       showError("⚠️ Already marked! Your attendance was recorded earlier.");
     }
     else {
@@ -788,7 +792,18 @@ function exportExcel() {
       const dLabel = parts.length === 3
         ? `${parts[2]}.${parts[1]}.${parts[0]}`
         : raw;
-      const label = dLabel + "\n" + (sess.period || "?");
+      // Convert HH:MM (24h) → 8.30am style
+      function fmtTime(t) {
+        if (!t || !t.includes(':')) return t || "?";
+        const [hStr, mStr] = t.split(':');
+        let h = parseInt(hStr, 10);
+        const m = mStr;
+        const ampm = h >= 12 ? 'pm' : 'am';
+        if (h > 12) h -= 12;
+        if (h === 0) h = 12;
+        return `${h}.${m}${ampm}`;
+      }
+      const label = dLabel + "\n" + fmtTime(sess.period);
       C(6, FIXED + si, label, {
         font:S.hdrFont(8,true), fill:S.fill("2B4590"),
         border:S.border, alignment:S.rotated
@@ -862,9 +877,17 @@ function exportExcel() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Attendance");
 
-    // Freeze rows 1-8 (header+DAY TOTAL) AND cols A-E (SI,USN,Name,Total,%)
-    // xlsx-js-style freeze: !freeze = { xSplit: cols, ySplit: rows }
-    ws['!freeze'] = { xSplit: 5, ySplit: 8 };
+    // Freeze rows 1–8 (headers + DAY TOTAL) and cols A–E (SI,USN,Name,Total,%)
+    // Correct SheetJS API: !sheetViews with state:'frozen'
+    // topLeftCell = first scrollable cell = col F (index 5), row 9 (index 8) → "F9"
+    ws['!sheetViews'] = [{
+      state: 'frozen',
+      xSplit: 5,
+      ySplit: 8,
+      topLeftCell: 'F9',
+      activeCell: 'F9',
+      sqref: 'F9'
+    }];
 
     const dateStr = new Date().toISOString().slice(0,10);
     XLSX.writeFile(wb, `Attendance_UIPath_Div${division}_${dateStr}.xlsx`);
@@ -878,6 +901,9 @@ function setTodayDate() {
   const pad = n => String(n).padStart(2,'0');
   document.getElementById('prof-date').value =
     `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  // Set period time to current time
+  document.getElementById('prof-period').value =
+    `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
