@@ -51,13 +51,12 @@ Professor monitors live list → closes session → exports Excel
 - Enter session token from board → Submit
 - After successful submission: **form is permanently replaced** with a success screen ("You may close this tab") — no back navigation, no resubmission possible
 - Duplicate attempt shows a clear warning and **disables all inputs** so USN cannot be swapped to attempt proxy
-
-### Excel Export (KLS Format)
+<img width="1895" height="932" alt="image" src="https://github.com/user-attachments/assets/1c145843-c12a-45af-bb59-9cd02adf62be" />
+### Excel Export (KLS GIT Format)
 Matches the standard KLS Gogte attendance register format:
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/db13fbb1-1753-4321-b88a-87b74303920f" />
 
-### Excel Attendance 
-<img width="1895" height="932" alt="image" src="https://github.com/user-attachments/assets/1c145843-c12a-45af-bb59-9cd02adf62be" />
+
 
 | Row | Content |
 |---|---|
