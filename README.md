@@ -42,6 +42,9 @@ Professor monitors live list → closes session → exports Excel
 - **Flash card notification** slides in top-right whenever a student marks attendance
 - Present / Absent / Total live counters
 - **Export Excel** — generates a KLS-format `.xlsx` file covering all sessions (up to 25 periods) with one column per session
+<img width="1907" height="948" alt="image" src="https://github.com/user-attachments/assets/7f12408b-98a0-492d-99ce-b84c02187ec5" />
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/25b4e762-3f4c-4280-99d1-a923341aa378" />
 
 ### Student Page
 - Select Division → Enter USN → name preview shown instantly
@@ -51,6 +54,10 @@ Professor monitors live list → closes session → exports Excel
 
 ### Excel Export (KLS Format)
 Matches the standard KLS Gogte attendance register format:
+<img width="1895" height="932" alt="image" src="https://github.com/user-attachments/assets/eb7c055e-0dc1-40d3-a53a-806948d02529" />
+
+### Excel Attendance 
+<img width="1895" height="932" alt="image" src="https://github.com/user-attachments/assets/1c145843-c12a-45af-bb59-9cd02adf62be" />
 
 | Row | Content |
 |---|---|
