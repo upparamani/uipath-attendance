@@ -54,7 +54,7 @@ Professor monitors live list → closes session → exports Excel
 
 ### Excel Export (KLS Format)
 Matches the standard KLS Gogte attendance register format:
-<img width="1895" height="932" alt="image" src="https://github.com/user-attachments/assets/eb7c055e-0dc1-40d3-a53a-806948d02529" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/db13fbb1-1753-4321-b88a-87b74303920f" />
 
 ### Excel Attendance 
 <img width="1895" height="932" alt="image" src="https://github.com/user-attachments/assets/1c145843-c12a-45af-bb59-9cd02adf62be" />
